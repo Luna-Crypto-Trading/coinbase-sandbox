@@ -1,0 +1,6 @@
+@coinbase_sandbox_HostAddress = http://localhost:5226
+
+GET {{coinbase_sandbox_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
