@@ -6,9 +6,20 @@ using CoinbaseSandbox.Infrastructure.Data;
 using CoinbaseSandbox.Infrastructure.External;
 using CoinbaseSandbox.Infrastructure.Repositories;
 using CoinbaseSandbox.Infrastructure.Services;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.OpenApi.Models;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure JSON options for API responses
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+});
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -28,11 +39,10 @@ builder.Services.AddScoped<IPriceService, PriceService>();
 // Add infrastructure services
 builder.Services.AddSingleton<IEventPublisher, InMemoryEventPublisher>();
 
-// Add HttpClient for external APIs
-builder.Services.AddHttpClient<ICoinbaseAdvancedTradeClient, MockCoinbaseAdvancedTradeClient>(client =>
+// Add HttpClient for real Coinbase API passthrough
+builder.Services.AddHttpClient<CoinbaseApiClient>(client =>
 {
-    // Configure the client for sandbox use
-    client.BaseAddress = new Uri("https://api-public.sandbox.pro.coinbase.com");
+    client.BaseAddress = new Uri("https://api.coinbase.com");
 });
 
 // Add API documentation
@@ -43,7 +53,33 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Coinbase Sandbox API",
         Version = "v1",
-        Description = "A sandbox API for testing Coinbase Advanced Trade integration"
+        Description = "A sandbox API that mimics the Coinbase Advanced Trade API but only mocks order execution, account balances, and wallet operations"
+    });
+    
+    // Define the security scheme for API key authentication
+    c.AddSecurityDefinition("CoinbaseApiKey", new OpenApiSecurityScheme
+    {
+        Description = "Coinbase API Key authentication using the CB-ACCESS-KEY header",
+        Name = "CB-ACCESS-KEY",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "ApiKeyScheme"
+    });
+    
+    // Add Security requirement for all operations
+    var scheme = new OpenApiSecurityScheme
+    {
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "CoinbaseApiKey"
+        },
+        In = ParameterLocation.Header
+    };
+    
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { scheme, new string[] { } }
     });
 });
 
