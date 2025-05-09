@@ -1,6 +1,6 @@
 namespace CoinbaseSandbox.Domain.Services;
 
-using CoinbaseSandbox.Domain.Models;
+using Models;
 
 public interface IOrderService
 {

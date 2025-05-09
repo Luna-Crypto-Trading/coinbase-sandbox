@@ -1,6 +1,6 @@
 namespace CoinbaseSandbox.Domain.Events;
 
-using CoinbaseSandbox.Domain.Models;
+using Models;
 
 public class OrderFilledEvent : IDomainEvent
 {

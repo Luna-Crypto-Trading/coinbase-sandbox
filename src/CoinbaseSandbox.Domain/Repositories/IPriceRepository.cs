@@ -1,6 +1,6 @@
 namespace CoinbaseSandbox.Domain.Repositories;
 
-using CoinbaseSandbox.Domain.Models;
+using Models;
 
 public interface IPriceRepository
 {
