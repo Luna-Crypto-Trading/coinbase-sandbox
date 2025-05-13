@@ -1,4 +1,5 @@
 // Program.cs
+using CoinbaseSandbox.Api.WebSockets;
 using CoinbaseSandbox.Application.Services;
 using CoinbaseSandbox.Domain.Repositories;
 using CoinbaseSandbox.Domain.Services;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using WebSocketManager = CoinbaseSandbox.Api.WebSockets.WebSocketManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,9 @@ builder.Services.Configure<JsonOptions>(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Add WebSocket support
+builder.Services.AddSingleton<WebSocketManager>();
 
 // Add repositories (in-memory for sandbox)
 builder.Services.AddSingleton<IProductRepository, InMemoryProductRepository>();
@@ -92,6 +97,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Configure WebSockets
+app.UseWebSockets(new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(120),
+    ReceiveBufferSize = 4 * 1024  // 4KB buffer
+});
+
+// Add WebSocket middleware
+app.UseMiddleware<WebSocketMiddleware>();
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
@@ -109,3 +124,5 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+public partial class Program;

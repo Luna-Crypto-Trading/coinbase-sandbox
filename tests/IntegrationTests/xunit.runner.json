@@ -1,0 +1,7 @@
+{
+  "xunit.runner.json": {
+    "shadowCopy": false,
+    "diagnosticMessages": true,
+    "methodDisplay": "method"
+  }
+}
