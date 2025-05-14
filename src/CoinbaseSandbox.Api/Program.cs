@@ -26,6 +26,9 @@ builder.Services.Configure<JsonOptions>(options =>
 // Add services to the container.
 builder.Services.AddControllers();
 
+// Configure static files to serve the WebSocket tester
+builder.Services.AddDirectoryBrowser();
+
 // Add WebSocket support
 builder.Services.AddSingleton<WebSocketManager>();
 
@@ -40,9 +43,12 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPriceService, PriceService>();
+builder.Services.AddScoped<IBacktestService, BacktestService>();
+builder.Services.AddScoped<ITechnicalAnalysisService, TechnicalAnalysisService>();
 
 // Add infrastructure services
 builder.Services.AddSingleton<IEventPublisher, InMemoryEventPublisher>();
+builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 // Add HttpClient for real Coinbase API passthrough
 builder.Services.AddHttpClient<CoinbaseApiClient>(client =>
@@ -95,6 +101,30 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+// Configure static files and directory browsing for the wwwroot folder
+app.UseStaticFiles();
+app.UseDirectoryBrowser(new DirectoryBrowserOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    RequestPath = "/browser"
+});
+
+// Create wwwroot directory if it doesn't exist
+var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+if (!Directory.Exists(wwwrootPath))
+{
+    Directory.CreateDirectory(wwwrootPath);
+}
+
+// Copy WebSocket tester HTML file to wwwroot if it exists
+var sourceFile = Path.Combine(Directory.GetCurrentDirectory(), "websocker-tester.html");
+var destFile = Path.Combine(wwwrootPath, "websocket-tester.html");
+if (System.IO.File.Exists(sourceFile) && !System.IO.File.Exists(destFile))
+{
+    System.IO.File.Copy(sourceFile, destFile);
 }
 
 // Configure WebSockets
