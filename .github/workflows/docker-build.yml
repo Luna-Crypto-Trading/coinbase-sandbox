@@ -6,7 +6,11 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
-
+    
+permissions:
+  contents: read
+  packages: write
+  
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
