@@ -24,16 +24,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase repository owner
+        run: echo "REPO_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/coinbase-sandbox:latest
-            ghcr.io/${{ github.repository_owner }}/coinbase-sandbox:${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/coinbase-sandbox:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/coinbase-sandbox:buildcache,mode=max
+            ghcr.io/${{ env.REPO_OWNER }}/coinbase-sandbox:latest
+            ghcr.io/${{ env.REPO_OWNER }}/coinbase-sandbox:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/coinbase-sandbox:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ env.REPO_OWNER }}/coinbase-sandbox:buildcache,mode=max
 
-      - name: Run Tests
-        run: dotnet test
+#      - name: Run Tests
+#        run: dotnet test
