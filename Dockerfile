@@ -29,7 +29,7 @@ COPY --from=build /app/publish .
 
 # Copy the WebSocket tester HTML file
 COPY websocker-tester.html ./wwwroot/websocket-tester.html
-
+COPY src/CoinbaseSandbox.Api/wwwroot/dashboard.html ./wwwroot/dashboard.html
 # Expose ports for HTTP and WebSockets
 EXPOSE 5226
 

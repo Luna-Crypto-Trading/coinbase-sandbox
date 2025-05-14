@@ -119,6 +119,13 @@ if (!Directory.Exists(wwwrootPath))
     Directory.CreateDirectory(wwwrootPath);
 }
 
+var dashboardSourceFile = Path.Combine(Directory.GetCurrentDirectory(), "src/CoinbaseSandbox.Api/wwwroot/dashboard.html");
+var dashboardDestFile = Path.Combine(wwwrootPath, "dashboard.html");
+if (System.IO.File.Exists(dashboardSourceFile) && !System.IO.File.Exists(dashboardDestFile))
+{
+    System.IO.File.Copy(dashboardSourceFile, dashboardDestFile);
+}
+
 // Copy WebSocket tester HTML file to wwwroot if it exists
 var sourceFile = Path.Combine(Directory.GetCurrentDirectory(), "websocker-tester.html");
 var destFile = Path.Combine(wwwrootPath, "websocket-tester.html");
