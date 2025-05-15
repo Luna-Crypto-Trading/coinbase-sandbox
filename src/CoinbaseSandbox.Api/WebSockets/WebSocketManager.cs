@@ -24,7 +24,7 @@ public class WebSocketManager
 
     // Track subscriptions for each websocket connection
     private readonly ConcurrentDictionary<string, HashSet<string>> _subscriptions = new();
-    
+
     // Track last known prices for each product to detect changes
     private readonly ConcurrentDictionary<string, decimal> _lastPrices = new();
 
@@ -32,10 +32,10 @@ public class WebSocketManager
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
-        
+
         // Set up a heartbeat timer (every 30 seconds)
         _heartbeatTimer = new Timer(SendHeartbeats, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
-        
+
         // Start the price update monitoring
         _ = MonitorPriceUpdatesAsync(_cancellationTokenSource.Token);
     }
@@ -47,7 +47,7 @@ public class WebSocketManager
     {
         _sockets.TryAdd(socketId, socket);
         _subscriptions.TryAdd(socketId, new HashSet<string>());
-        
+
         _logger.LogInformation("WebSocket added: {SocketId}", socketId);
     }
 
@@ -71,24 +71,24 @@ public class WebSocketManager
         try
         {
             var request = JsonSerializer.Deserialize<SubscriptionRequest>(message);
-            
+
             if (request == null)
             {
                 await SendErrorAsync(socketId, "Invalid request format");
                 return;
             }
-            
+
             // Handle different types of requests
             switch (request.Type.ToLower())
             {
                 case "subscribe":
                     await HandleSubscribeAsync(socketId, request);
                     break;
-                    
+
                 case "unsubscribe":
                     await HandleUnsubscribeAsync(socketId, request);
                     break;
-                    
+
                 default:
                     await SendErrorAsync(socketId, $"Unknown request type: {request.Type}");
                     break;
@@ -116,20 +116,20 @@ public class WebSocketManager
             await SendErrorAsync(socketId, "No product IDs provided");
             return;
         }
-        
+
         if (request.Channels == null || !request.Channels.Any())
         {
             await SendErrorAsync(socketId, "No channels provided");
             return;
         }
-        
+
         // Get the subscription set for this socket
         if (!_subscriptions.TryGetValue(socketId, out var subscriptions))
         {
             subscriptions = new HashSet<string>();
             _subscriptions[socketId] = subscriptions;
         }
-        
+
         // Process each channel and product combination
         foreach (var channel in request.Channels)
         {
@@ -152,13 +152,13 @@ public class WebSocketManager
                     continue;
                 }
             }
-            
+
             // Add subscriptions
             foreach (var productId in request.ProductIds)
             {
                 string subscriptionKey = $"{channelName}:{productId}";
                 subscriptions.Add(subscriptionKey);
-                
+
                 // Initialize last price for ticker channel
                 if (channelName == "ticker" || channelName == "level2")
                 {
@@ -170,7 +170,7 @@ public class WebSocketManager
                             var priceService = scope.ServiceProvider.GetRequiredService<IPriceService>();
                             var price = await priceService.GetCurrentPriceAsync(productId);
                             _lastPrices[productId] = price;
-                            
+
                             // Send an initial update
                             await SendTickerUpdateAsync(socketId, productId, price);
                         }
@@ -182,14 +182,14 @@ public class WebSocketManager
                 }
             }
         }
-        
+
         // Send confirmation
         await SendMessageAsync(socketId, new
         {
             type = "subscriptions",
             channels = request.Channels
-                .Select(c => c is JsonElement element && element.ValueKind == JsonValueKind.Object 
-                    ? JsonSerializer.Deserialize<object>(element.GetRawText()) 
+                .Select(c => c is JsonElement element && element.ValueKind == JsonValueKind.Object
+                    ? JsonSerializer.Deserialize<object>(element.GetRawText())
                     : c)
                 .ToList()
         });
@@ -204,7 +204,7 @@ public class WebSocketManager
         {
             return;
         }
-        
+
         if (request.Channels == null || !request.Channels.Any())
         {
             // If no channels specified, unsubscribe from all
@@ -233,7 +233,7 @@ public class WebSocketManager
                         continue;
                     }
                 }
-                
+
                 // Remove subscriptions
                 if (request.ProductIds == null || !request.ProductIds.Any())
                 {
@@ -241,7 +241,7 @@ public class WebSocketManager
                     var keysToRemove = subscriptions
                         .Where(s => s.StartsWith($"{channelName}:"))
                         .ToList();
-                        
+
                     foreach (var key in keysToRemove)
                     {
                         subscriptions.Remove(key);
@@ -258,7 +258,7 @@ public class WebSocketManager
                 }
             }
         }
-        
+
         // Send confirmation
         await SendMessageAsync(socketId, new
         {
@@ -276,7 +276,7 @@ public class WebSocketManager
         {
             return new List<object>();
         }
-        
+
         var channelGroups = subscriptions
             .Select(s => s.Split(':'))
             .Where(parts => parts.Length == 2)
@@ -287,7 +287,7 @@ public class WebSocketManager
                 product_ids = g.Select(parts => parts[1]).ToList()
             })
             .ToList<object>();
-            
+
         return channelGroups;
     }
 
@@ -302,7 +302,7 @@ public class WebSocketManager
             {
                 // Build a unique list of all product IDs that any socket is subscribed to
                 var productIds = new HashSet<string>();
-                
+
                 foreach (var kvp in _subscriptions)
                 {
                     foreach (var subscription in kvp.Value)
@@ -314,7 +314,7 @@ public class WebSocketManager
                         }
                     }
                 }
-                
+
                 // Check for price updates for each product
                 foreach (var productId in productIds)
                 {
@@ -327,12 +327,12 @@ public class WebSocketManager
                             {
                                 var priceService = scope.ServiceProvider.GetRequiredService<IPriceService>();
                                 var currentPrice = await priceService.GetCurrentPriceAsync(productId);
-                                
+
                                 // Only send updates if the price has changed
                                 if (currentPrice != lastPrice)
                                 {
                                     _lastPrices[productId] = currentPrice;
-                                    
+
                                     // Broadcast to all subscribed clients
                                     await BroadcastTickerUpdateAsync(productId, currentPrice);
                                 }
@@ -344,7 +344,7 @@ public class WebSocketManager
                         }
                     }
                 }
-                
+
                 // Check every second
                 await Task.Delay(1000, cancellationToken);
             }
@@ -356,7 +356,7 @@ public class WebSocketManager
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in price update monitoring");
-                
+
                 // Keep the background task running
                 await Task.Delay(5000, cancellationToken);
             }
@@ -372,7 +372,7 @@ public class WebSocketManager
         {
             var socketId = kvp.Key;
             var subscriptions = kvp.Value;
-            
+
             // Check if this socket is subscribed to ticker updates for this product
             if (subscriptions.Contains($"ticker:{productId}") || subscriptions.Contains($"level2:{productId}"))
             {
@@ -393,21 +393,21 @@ public class WebSocketManager
             price = price.ToString(),
             time = DateTime.UtcNow.ToString("O")
         };
-        
+
         await SendMessageAsync(socketId, tickerData);
-        
+
         // If level2 is subscribed, also send an order book update
         if (_subscriptions.TryGetValue(socketId, out var subscriptions) && subscriptions.Contains($"level2:{productId}"))
         {
             // Generate a mock order book around the current price
             var bidPrice = price * 0.999m; // 0.1% below current price
             var askPrice = price * 1.001m; // 0.1% above current price
-            
+
             // Create some random order book entries
             var random = new Random();
             var bids = new List<object>();
             var asks = new List<object>();
-            
+
             // Generate 10 bid levels
             for (int i = 0; i < 10; i++)
             {
@@ -415,7 +415,7 @@ public class WebSocketManager
                 var size = Math.Round(0.1m + (decimal)random.NextDouble() * 2, 6);
                 bids.Add(new[] { levelPrice.ToString("F2"), size.ToString("F6") });
             }
-            
+
             // Generate 10 ask levels
             for (int i = 0; i < 10; i++)
             {
@@ -423,7 +423,7 @@ public class WebSocketManager
                 var size = Math.Round(0.1m + (decimal)random.NextDouble() * 2, 6);
                 asks.Add(new[] { levelPrice.ToString("F2"), size.ToString("F6") });
             }
-            
+
             var orderBookData = new
             {
                 type = "l2update",
@@ -435,7 +435,7 @@ public class WebSocketManager
                 },
                 time = DateTime.UtcNow.ToString("O")
             };
-            
+
             await SendMessageAsync(socketId, orderBookData);
         }
     }
@@ -476,18 +476,18 @@ public class WebSocketManager
         {
             return;
         }
-        
+
         try
         {
             var messageJson = JsonSerializer.Serialize(message);
             var messageBytes = Encoding.UTF8.GetBytes(messageJson);
-            
+
             if (socket.State == WebSocketState.Open)
             {
                 await socket.SendAsync(
-                    new ArraySegment<byte>(messageBytes), 
-                    WebSocketMessageType.Text, 
-                    true, 
+                    new ArraySegment<byte>(messageBytes),
+                    WebSocketMessageType.Text,
+                    true,
                     CancellationToken.None);
             }
             else
@@ -510,7 +510,7 @@ public class WebSocketManager
     {
         _cancellationTokenSource.Cancel();
         _heartbeatTimer.Dispose();
-        
+
         // Close all sockets
         foreach (var kvp in _sockets)
         {
@@ -518,8 +518,8 @@ public class WebSocketManager
             {
                 // Send a close message
                 kvp.Value.CloseAsync(
-                    WebSocketCloseStatus.NormalClosure, 
-                    "Server shutting down", 
+                    WebSocketCloseStatus.NormalClosure,
+                    "Server shutting down",
                     CancellationToken.None).Wait(1000);
             }
             catch (Exception ex)
@@ -527,7 +527,7 @@ public class WebSocketManager
                 _logger.LogError(ex, "Error closing WebSocket {SocketId}", kvp.Key);
             }
         }
-        
+
         _sockets.Clear();
         _subscriptions.Clear();
         _lastPrices.Clear();
@@ -538,10 +538,10 @@ public class SubscriptionRequest
 {
     [JsonPropertyName("type")]
     public string Type { get; set; }
-    
+
     [JsonPropertyName("product_ids")]
     public List<string>? ProductIds { get; set; }
-    
+
     [JsonPropertyName("channels")]
     public List<object>? Channels { get; set; }
 }

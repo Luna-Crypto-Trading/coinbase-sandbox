@@ -9,7 +9,7 @@ public class TechnicalAnalysisController : ControllerBase
 {
     private readonly ITechnicalAnalysisService _technicalAnalysisService;
     private readonly ILogger<TechnicalAnalysisController> _logger;
-    
+
     public TechnicalAnalysisController(
         ITechnicalAnalysisService technicalAnalysisService,
         ILogger<TechnicalAnalysisController> logger)
@@ -17,7 +17,7 @@ public class TechnicalAnalysisController : ControllerBase
         _technicalAnalysisService = technicalAnalysisService;
         _logger = logger;
     }
-    
+
     [HttpGet("{productId}/indicators")]
     public async Task<IActionResult> GetIndicators(
         string productId,
@@ -26,9 +26,9 @@ public class TechnicalAnalysisController : ControllerBase
         try
         {
             var indicators = await _technicalAnalysisService.GetTechnicalIndicatorsAsync(
-                productId, 
+                productId,
                 cancellationToken);
-                
+
             return Ok(indicators);
         }
         catch (KeyNotFoundException)
@@ -45,7 +45,7 @@ public class TechnicalAnalysisController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpGet("{productId}/sma")]
     public async Task<IActionResult> GetSimpleMovingAverages(
         string productId,
@@ -59,17 +59,17 @@ public class TechnicalAnalysisController : ControllerBase
                 .Select(p => int.TryParse(p.Trim(), out var result) ? result : 0)
                 .Where(p => p > 0)
                 .ToArray();
-                
+
             if (!periodValues.Any())
             {
                 return BadRequest(new { error = "Invalid periods. Provide comma-separated integers." });
             }
-            
+
             var smas = await _technicalAnalysisService.CalculateSimpleMovingAveragesAsync(
-                productId, 
-                periodValues, 
+                productId,
+                periodValues,
                 cancellationToken);
-                
+
             return Ok(smas);
         }
         catch (KeyNotFoundException)
@@ -86,7 +86,7 @@ public class TechnicalAnalysisController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpGet("{productId}/ema")]
     public async Task<IActionResult> GetExponentialMovingAverages(
         string productId,
@@ -100,17 +100,17 @@ public class TechnicalAnalysisController : ControllerBase
                 .Select(p => int.TryParse(p.Trim(), out var result) ? result : 0)
                 .Where(p => p > 0)
                 .ToArray();
-                
+
             if (!periodValues.Any())
             {
                 return BadRequest(new { error = "Invalid periods. Provide comma-separated integers." });
             }
-            
+
             var emas = await _technicalAnalysisService.CalculateExponentialMovingAveragesAsync(
-                productId, 
-                periodValues, 
+                productId,
+                periodValues,
                 cancellationToken);
-                
+
             return Ok(emas);
         }
         catch (KeyNotFoundException)
@@ -127,7 +127,7 @@ public class TechnicalAnalysisController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpGet("{productId}/rsi")]
     public async Task<IActionResult> GetRelativeStrengthIndex(
         string productId,
@@ -140,12 +140,12 @@ public class TechnicalAnalysisController : ControllerBase
             {
                 return BadRequest(new { error = "Period must be positive" });
             }
-            
+
             var rsi = await _technicalAnalysisService.CalculateRelativeStrengthIndexAsync(
-                productId, 
-                period, 
+                productId,
+                period,
                 cancellationToken);
-                
+
             return Ok(new { rsi });
         }
         catch (KeyNotFoundException)
@@ -162,7 +162,7 @@ public class TechnicalAnalysisController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpGet("{productId}/bollinger-bands")]
     public async Task<IActionResult> GetBollingerBands(
         string productId,
@@ -176,18 +176,18 @@ public class TechnicalAnalysisController : ControllerBase
             {
                 return BadRequest(new { error = "Period must be positive" });
             }
-            
+
             if (standardDeviations <= 0)
             {
                 return BadRequest(new { error = "Standard deviations must be positive" });
             }
-            
+
             var bollingerBands = await _technicalAnalysisService.CalculateBollingerBandsAsync(
-                productId, 
-                period, 
-                standardDeviations, 
+                productId,
+                period,
+                standardDeviations,
                 cancellationToken);
-                
+
             return Ok(new
             {
                 upper = bollingerBands.upper,

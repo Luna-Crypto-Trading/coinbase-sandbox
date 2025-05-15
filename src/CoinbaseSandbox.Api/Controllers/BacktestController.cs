@@ -11,7 +11,7 @@ public class BacktestController : ControllerBase
 {
     private readonly IBacktestService _backtestService;
     private readonly ILogger<BacktestController> _logger;
-    
+
     public BacktestController(
         IBacktestService backtestService,
         ILogger<BacktestController> logger)
@@ -19,7 +19,7 @@ public class BacktestController : ControllerBase
         _backtestService = backtestService;
         _logger = logger;
     }
-    
+
     public class RunBacktestRequest
     {
         public string StrategyName { get; set; } = string.Empty;
@@ -29,7 +29,7 @@ public class BacktestController : ControllerBase
         public decimal InitialBalance { get; set; } = 10000m;
         public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
     }
-    
+
     [HttpPost("run")]
     public async Task<IActionResult> RunBacktest(
         [FromBody] RunBacktestRequest request,
@@ -41,27 +41,27 @@ public class BacktestController : ControllerBase
             {
                 return BadRequest("Strategy name is required");
             }
-            
+
             if (string.IsNullOrWhiteSpace(request.ProductId))
             {
                 return BadRequest("Product ID is required");
             }
-            
+
             if (!DateTime.TryParse(request.StartDate, out var startDate))
             {
                 return BadRequest("Invalid start date format");
             }
-            
+
             if (!DateTime.TryParse(request.EndDate, out var endDate))
             {
                 return BadRequest("Invalid end date format");
             }
-            
+
             if (startDate >= endDate)
             {
                 return BadRequest("Start date must be before end date");
             }
-            
+
             var result = await _backtestService.RunBacktestAsync(
                 request.StrategyName,
                 request.ProductId,
@@ -70,7 +70,7 @@ public class BacktestController : ControllerBase
                 request.InitialBalance,
                 request.Parameters,
                 cancellationToken);
-                
+
             return Ok(result);
         }
         catch (KeyNotFoundException ex)
@@ -83,7 +83,7 @@ public class BacktestController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpGet("strategies")]
     public async Task<IActionResult> GetStrategies(CancellationToken cancellationToken)
     {
@@ -103,7 +103,7 @@ public class BacktestController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpGet("strategies/{name}")]
     public async Task<IActionResult> GetStrategy(string name, CancellationToken cancellationToken)
     {
@@ -128,7 +128,7 @@ public class BacktestController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpPost("strategies")]
     public async Task<IActionResult> SaveStrategy(
         [FromBody] BacktestStrategy strategy,
@@ -140,7 +140,7 @@ public class BacktestController : ControllerBase
             {
                 return BadRequest("Strategy name is required");
             }
-            
+
             // Validate parameters are valid JSON
             try
             {
@@ -150,7 +150,7 @@ public class BacktestController : ControllerBase
             {
                 return BadRequest("Invalid parameters format");
             }
-            
+
             await _backtestService.SaveStrategyAsync(strategy, cancellationToken);
             return Ok(new { success = true, message = $"Strategy '{strategy.Name}' saved successfully" });
         }
@@ -160,7 +160,7 @@ public class BacktestController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpGet("results")]
     public async Task<IActionResult> GetResults(
         [FromQuery] int limit = 10,
@@ -189,7 +189,7 @@ public class BacktestController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpGet("results/{id}")]
     public async Task<IActionResult> GetResult(string id, CancellationToken cancellationToken)
     {

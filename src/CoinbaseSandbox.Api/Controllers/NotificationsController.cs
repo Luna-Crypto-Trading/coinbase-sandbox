@@ -9,7 +9,7 @@ public class NotificationsController : ControllerBase
 {
     private readonly INotificationService _notificationService;
     private readonly ILogger<NotificationsController> _logger;
-    
+
     public NotificationsController(
         INotificationService notificationService,
         ILogger<NotificationsController> logger)
@@ -17,13 +17,13 @@ public class NotificationsController : ControllerBase
         _notificationService = notificationService;
         _logger = logger;
     }
-    
+
     public class SubscribeToPriceAlertsRequest
     {
         public string ProductId { get; set; } = string.Empty;
         public decimal Threshold { get; set; } = 1.0m; // Default to 1% threshold
     }
-    
+
     [HttpPost("subscribe/price-alerts")]
     public async Task<IActionResult> SubscribeToPriceAlerts(
         [FromBody] SubscribeToPriceAlertsRequest request,
@@ -35,17 +35,17 @@ public class NotificationsController : ControllerBase
             {
                 return BadRequest("Product ID is required");
             }
-            
+
             if (request.Threshold <= 0)
             {
                 return BadRequest("Threshold must be positive");
             }
-            
+
             await _notificationService.SubscribeToPriceAlertsAsync(
-                request.ProductId, 
-                request.Threshold, 
+                request.ProductId,
+                request.Threshold,
                 cancellationToken);
-                
+
             return Ok(new
             {
                 success = true,
@@ -58,7 +58,7 @@ public class NotificationsController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
         }
     }
-    
+
     [HttpDelete("unsubscribe/price-alerts/{productId}")]
     public async Task<IActionResult> UnsubscribeFromPriceAlerts(
         string productId,
@@ -67,9 +67,9 @@ public class NotificationsController : ControllerBase
         try
         {
             await _notificationService.UnsubscribeFromPriceAlertsAsync(
-                productId, 
+                productId,
                 cancellationToken);
-                
+
             return Ok(new
             {
                 success = true,

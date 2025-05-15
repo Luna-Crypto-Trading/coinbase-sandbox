@@ -29,7 +29,7 @@ public class DashboardController(IWebHostEnvironment environment) : ControllerBa
 
         return PhysicalFile(path, "text/html");
     }
-    
+
     [HttpGet("")]
     public IActionResult Index()
     {

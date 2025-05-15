@@ -11,11 +11,11 @@ public class BacktestService : IBacktestService
     private readonly IPriceService _priceService;
     private readonly IProductService _productService;
     private readonly ILogger<BacktestService> _logger;
-    
+
     // In-memory storage for backtest results and strategies
     private readonly ConcurrentDictionary<string, BacktestResult> _results = new();
     private readonly ConcurrentDictionary<string, BacktestStrategy> _strategies = new();
-    
+
     public BacktestService(
         IPriceService priceService,
         IProductService productService,
@@ -24,11 +24,11 @@ public class BacktestService : IBacktestService
         _priceService = priceService;
         _productService = productService;
         _logger = logger;
-        
+
         // Add some example strategies
         InitializeExampleStrategies();
     }
-    
+
     private void InitializeExampleStrategies()
     {
         // Simple Moving Average Crossover Strategy
@@ -101,7 +101,7 @@ List<decimal> CalculateSMA(List<PricePoint> prices, int period)
     return result;
 }"
         };
-        
+
         // Bollinger Bands Strategy
         var bollingerBands = new BacktestStrategy
         {
@@ -158,7 +158,7 @@ for (int i = period; i < prices.Count; i++)
     }
 }"
         };
-        
+
         // RSI Strategy
         var rsiStrategy = new BacktestStrategy
         {
@@ -234,12 +234,12 @@ for (int i = period; i < priceChanges.Count; i++)
     }
 }"
         };
-        
+
         _strategies[smaCrossover.Name] = smaCrossover;
         _strategies[bollingerBands.Name] = bollingerBands;
         _strategies[rsiStrategy.Name] = rsiStrategy;
     }
-    
+
     public async Task<BacktestResult> RunBacktestAsync(
         string strategyName,
         string productId,
@@ -254,24 +254,24 @@ for (int i = period; i < priceChanges.Count; i++)
         {
             throw new KeyNotFoundException($"Strategy '{strategyName}' not found");
         }
-        
+
         // Validate product exists
         var product = await _productService.GetProductAsync(productId, cancellationToken);
-        
+
         // Get historical price data
         var priceHistory = await _priceService.GetPriceHistoryAsync(
-            productId, 
-            startDate, 
-            endDate, 
+            productId,
+            startDate,
+            endDate,
             cancellationToken);
-            
+
         var prices = priceHistory.ToList();
-        
+
         if (!prices.Any())
         {
             throw new InvalidOperationException("No price data available for the specified period");
         }
-        
+
         // Create a new backtest result
         var result = new BacktestResult
         {
@@ -281,32 +281,32 @@ for (int i = period; i < priceChanges.Count; i++)
             ProductId = productId,
             InitialBalance = initialBalance
         };
-        
+
         // Run the backtest (simplified implementation)
         await SimulateBacktestAsync(result, strategy, prices, initialBalance, parameters);
-        
+
         // Store the result
         _results[result.Id] = result;
-        
+
         return result;
     }
-    
+
     private async Task SimulateBacktestAsync(
         BacktestResult result,
         BacktestStrategy strategy,
-        List<PricePoint> prices, 
+        List<PricePoint> prices,
         decimal initialBalance,
         IDictionary<string, string> parameters)
     {
         // Initialize variables for the backtest
         decimal cashBalance = initialBalance;
         decimal cryptoBalance = 0;
-        
+
         // Track equity curve (portfolio value over time)
         foreach (var price in prices)
         {
             decimal portfolioValue = cashBalance + (cryptoBalance * price.Price);
-            
+
             result.EquityCurve.Add(new BacktestDataPoint
             {
                 Timestamp = price.Timestamp,
@@ -314,32 +314,32 @@ for (int i = period; i < priceChanges.Count; i++)
                 PortfolioValue = portfolioValue
             });
         }
-        
+
         // This is where we would execute the strategy code
         // For simplicity, let's just simulate some trades
-        
+
         // Simple SMA crossover strategy example
         if (strategy.Name == "SMA Crossover")
         {
             int shortPeriod = int.Parse(parameters["ShortPeriod"]);
             int longPeriod = int.Parse(parameters["LongPeriod"]);
-            
+
             // Calculate SMAs
             var shortSma = CalculateSMA(prices, shortPeriod);
             var longSma = CalculateSMA(prices, longPeriod);
-            
+
             // Trading logic
             bool lastCrossed = false;
             for (int i = longPeriod; i < prices.Count; i++)
             {
                 bool isCrossedAbove = shortSma[i] > longSma[i];
-                
+
                 if (isCrossedAbove && !lastCrossed && cryptoBalance == 0)
                 {
                     // Buy signal - short SMA crossed above long SMA
                     decimal amountToSpend = cashBalance * 0.98m; // 98% of cash, leaving some for fees
                     decimal size = amountToSpend / prices[i].Price;
-                    
+
                     ExecuteTrade(result, OrderSide.Buy, prices[i].Timestamp, prices[i].Price, size, "SMA Crossed Above", ref cashBalance, ref cryptoBalance);
                 }
                 else if (!isCrossedAbove && lastCrossed && cryptoBalance > 0)
@@ -347,11 +347,11 @@ for (int i = period; i < priceChanges.Count; i++)
                     // Sell signal - short SMA crossed below long SMA
                     ExecuteTrade(result, OrderSide.Sell, prices[i].Timestamp, prices[i].Price, cryptoBalance, "SMA Crossed Below", ref cashBalance, ref cryptoBalance);
                 }
-                
+
                 lastCrossed = isCrossedAbove;
             }
         }
-        
+
         // Calculate final results
         decimal finalPortfolioValue = cashBalance + (cryptoBalance * prices.Last().Price);
         result.FinalBalance = finalPortfolioValue;
@@ -359,17 +359,17 @@ for (int i = period; i < priceChanges.Count; i++)
         result.ProfitLossPercent = (result.ProfitLoss / initialBalance) * 100;
         result.TotalTrades = result.Trades.Count;
     }
-    
+
     private List<decimal> CalculateSMA(List<PricePoint> prices, int period)
     {
         var result = new List<decimal>();
-        
+
         // Initialize with zeros for the first period-1 elements
         for (int i = 0; i < period - 1; i++)
         {
             result.Add(0);
         }
-        
+
         // Calculate SMA for the rest
         for (int i = period - 1; i < prices.Count; i++)
         {
@@ -380,10 +380,10 @@ for (int i = period; i < priceChanges.Count; i++)
             }
             result.Add(sum / period);
         }
-        
+
         return result;
     }
-    
+
     private void ExecuteTrade(
         BacktestResult result,
         OrderSide side,
@@ -396,7 +396,7 @@ for (int i = period; i < priceChanges.Count; i++)
     {
         decimal value = price * size;
         decimal fee = value * 0.005m; // 0.5% fee
-        
+
         if (side == OrderSide.Buy)
         {
             // Deduct cash, add crypto
@@ -409,7 +409,7 @@ for (int i = period; i < priceChanges.Count; i++)
             cashBalance += (value - fee);
             cryptoBalance -= size;
         }
-        
+
         // Record the trade
         result.Trades.Add(new BacktestTrade
         {
@@ -420,10 +420,10 @@ for (int i = period; i < priceChanges.Count; i++)
             Value = value,
             Reason = reason
         });
-        
+
         // Update equity curve with the trade
         decimal portfolioValue = cashBalance + (cryptoBalance * price);
-        
+
         // Find the equity curve point for this timestamp or add a new one
         var equityPoint = result.EquityCurve.FirstOrDefault(p => p.Timestamp == timestamp);
         if (equityPoint != null)
@@ -440,51 +440,51 @@ for (int i = period; i < priceChanges.Count; i++)
             });
         }
     }
-    
+
     public Task<IEnumerable<BacktestStrategy>> GetAvailableStrategiesAsync(
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult<IEnumerable<BacktestStrategy>>(_strategies.Values.ToList());
     }
-    
+
     public Task<BacktestStrategy> GetStrategyAsync(
-        string name, 
+        string name,
         CancellationToken cancellationToken = default)
     {
         if (!_strategies.TryGetValue(name, out var strategy))
         {
             throw new KeyNotFoundException($"Strategy '{name}' not found");
         }
-        
+
         return Task.FromResult(strategy);
     }
-    
+
     public Task<BacktestResult> GetBacktestResultAsync(
-        string id, 
+        string id,
         CancellationToken cancellationToken = default)
     {
         if (!_results.TryGetValue(id, out var result))
         {
             throw new KeyNotFoundException($"Backtest result '{id}' not found");
         }
-        
+
         return Task.FromResult(result);
     }
-    
+
     public Task<IEnumerable<BacktestResult>> GetBacktestResultsAsync(
-        int limit = 10, 
+        int limit = 10,
         CancellationToken cancellationToken = default)
     {
         var results = _results.Values
             .OrderByDescending(r => r.EndDate)
             .Take(limit)
             .ToList();
-            
+
         return Task.FromResult<IEnumerable<BacktestResult>>(results);
     }
-    
+
     public Task SaveStrategyAsync(
-        BacktestStrategy strategy, 
+        BacktestStrategy strategy,
         CancellationToken cancellationToken = default)
     {
         _strategies[strategy.Name] = strategy;

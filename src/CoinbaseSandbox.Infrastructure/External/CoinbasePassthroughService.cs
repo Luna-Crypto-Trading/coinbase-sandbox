@@ -5,12 +5,12 @@ namespace CoinbaseSandbox.Infrastructure.External;
 public class CoinbasePassthroughService
 {
     private readonly ICoinbaseAdvancedTradeClient _client;
-    
+
     public CoinbasePassthroughService(ICoinbaseAdvancedTradeClient client)
     {
         _client = client;
     }
-    
+
     // This would implement the passthrough functionality
     // For now, it's just a placeholder
 }

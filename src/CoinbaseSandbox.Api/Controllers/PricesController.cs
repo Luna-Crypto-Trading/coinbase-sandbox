@@ -9,21 +9,21 @@ using Microsoft.AspNetCore.Mvc;
 public class PricesController : ControllerBase
 {
     private readonly IPriceService _priceService;
-    
+
     public PricesController(IPriceService priceService)
     {
         _priceService = priceService;
     }
-    
+
     [HttpGet("{productId}/current")]
     public async Task<ActionResult<decimal>> GetCurrentPrice(
-        string productId, 
+        string productId,
         CancellationToken cancellationToken)
     {
         try
         {
             var price = await _priceService.GetCurrentPriceAsync(productId, cancellationToken);
-            
+
             return Ok(price);
         }
         catch (ArgumentException ex)
@@ -35,7 +35,7 @@ public class PricesController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-    
+
     [HttpGet("{productId}/history")]
     public async Task<ActionResult<IEnumerable<PriceDto>>> GetPriceHistory(
         string productId,
@@ -46,11 +46,11 @@ public class PricesController : ControllerBase
         try
         {
             var priceHistory = await _priceService.GetPriceHistoryAsync(
-                productId, 
-                start, 
-                end, 
+                productId,
+                start,
+                end,
                 cancellationToken);
-                
+
             return Ok(priceHistory.Select(p => new PriceDto(
                 p.ProductId,
                 p.Price,
@@ -62,7 +62,7 @@ public class PricesController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-    
+
     // This would only be available in the sandbox environment for testing
     [HttpPost("{productId}/mock")]
     public async Task<ActionResult<PriceDto>> SetMockPrice(
@@ -73,10 +73,10 @@ public class PricesController : ControllerBase
         try
         {
             var pricePoint = await _priceService.SetMockPriceAsync(
-                productId, 
-                price, 
+                productId,
+                price,
                 cancellationToken);
-                
+
             return Ok(new PriceDto(
                 pricePoint.ProductId,
                 pricePoint.Price,

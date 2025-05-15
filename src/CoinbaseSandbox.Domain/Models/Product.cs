@@ -6,7 +6,7 @@ public record Product
     public Currency BaseCurrency { get; init; } // The currency being bought/sold
     public Currency QuoteCurrency { get; init; } // The currency used to buy/sell
     public decimal MinimumOrderSize { get; init; }
-    
+
     public Product(
         string id,
         Currency baseCurrency,

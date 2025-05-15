@@ -19,9 +19,9 @@ public class WebSocketMiddleware(
             {
                 var socket = await context.WebSockets.AcceptWebSocketAsync();
                 var socketId = Guid.NewGuid().ToString();
-                
+
                 webSocketManager.AddSocket(socketId, socket);
-                
+
                 await HandleSocketAsync(socketId, socket);
             }
             else
@@ -38,15 +38,15 @@ public class WebSocketMiddleware(
     private async Task HandleSocketAsync(string socketId, WebSocket socket)
     {
         var buffer = new byte[4096];
-        
+
         try
         {
             while (socket.State == WebSocketState.Open)
             {
                 var result = await socket.ReceiveAsync(
-                    new ArraySegment<byte>(buffer), 
+                    new ArraySegment<byte>(buffer),
                     CancellationToken.None);
-                    
+
                 if (result.MessageType == WebSocketMessageType.Text)
                 {
                     var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
@@ -55,12 +55,12 @@ public class WebSocketMiddleware(
                 else if (result.MessageType == WebSocketMessageType.Close)
                 {
                     webSocketManager.RemoveSocket(socketId);
-                    
+
                     await socket.CloseAsync(
                         WebSocketCloseStatus.NormalClosure,
                         "Connection closed by client",
                         CancellationToken.None);
-                        
+
                     break;
                 }
             }
@@ -76,7 +76,7 @@ public class WebSocketMiddleware(
         finally
         {
             webSocketManager.RemoveSocket(socketId);
-            
+
             if (socket.State != WebSocketState.Closed)
             {
                 try

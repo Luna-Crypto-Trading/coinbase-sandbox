@@ -20,27 +20,38 @@ public class CoinbaseApiClient(HttpClient httpClient, ILogger<CoinbaseApiClient>
     /// Passes through a GET request to the real Coinbase API using the provided headers
     /// </summary>
     public async Task<T?> GetAsync<T>(
-        string endpoint, 
+        string endpoint,
         string cbAccessKey,
-        string cbAccessSign, 
-        string cbAccessTimestamp, 
+        string cbAccessSign,
+        string cbAccessTimestamp,
         CancellationToken cancellationToken = default)
     {
         try
         {
             // Create request with authentication headers from original request
             var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
-            
-            request.Headers.Add("CB-ACCESS-KEY", cbAccessKey);
-            request.Headers.Add("CB-ACCESS-SIGN", cbAccessSign);
-            request.Headers.Add("CB-ACCESS-TIMESTAMP", cbAccessTimestamp);
-            
+
+            // Check if authentication is via JWT Bearer token
+            if (cbAccessKey.Contains('.') && cbAccessKey.Split('.').Length >= 2)
+            {
+                // Forward the bearer token
+                request.Headers.Add("Authorization", $"Bearer {cbAccessKey}");
+                logger.LogInformation("Using Bearer token authentication for passthrough");
+            }
+            else
+            {
+                // Using traditional headers
+                request.Headers.Add("CB-ACCESS-KEY", cbAccessKey);
+                request.Headers.Add("CB-ACCESS-SIGN", cbAccessSign);
+                request.Headers.Add("CB-ACCESS-TIMESTAMP", cbAccessTimestamp);
+            }
+
             // Send request to real Coinbase API
             var response = await httpClient.SendAsync(request, cancellationToken);
-            
+
             // Ensure we got a successful response
             response.EnsureSuccessStatusCode();
-            
+
             // Parse and return the response
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
             return JsonSerializer.Deserialize<T>(content);
@@ -51,7 +62,29 @@ public class CoinbaseApiClient(HttpClient httpClient, ILogger<CoinbaseApiClient>
             throw;
         }
     }
-
+    
+    /// <summary>
+    /// Fetches best bid and ask data from the real Coinbase API
+    /// </summary>
+    public async Task<T?> GetBestBidAskAsync<T>(
+        List<string> productIds,
+        string cbAccessKey,
+        string cbAccessSign,
+        string cbAccessTimestamp,
+        CancellationToken cancellationToken = default)
+    {
+        // Construct the query string with multiple product_ids
+        string queryString = string.Join("&", productIds.Select(id => $"product_ids={Uri.EscapeDataString(id)}"));
+        string endpoint = $"/api/v3/brokerage/best_bid_ask?{queryString}";
+    
+        return await GetAsync<T>(
+            endpoint,
+            cbAccessKey,
+            cbAccessSign,
+            cbAccessTimestamp,
+            cancellationToken);
+    }
+    
     /// <summary>
     /// Fetches product data from the real Coinbase API
     /// </summary>
@@ -62,10 +95,10 @@ public class CoinbaseApiClient(HttpClient httpClient, ILogger<CoinbaseApiClient>
         CancellationToken cancellationToken = default)
     {
         return await GetAsync<T>(
-            "/api/v3/brokerage/products", 
-            cbAccessKey, 
-            cbAccessSign, 
-            cbAccessTimestamp, 
+            "/api/v3/brokerage/products",
+            cbAccessKey,
+            cbAccessSign,
+            cbAccessTimestamp,
             cancellationToken);
     }
 
@@ -125,7 +158,7 @@ public class CoinbaseApiClient(HttpClient httpClient, ILogger<CoinbaseApiClient>
             cbAccessTimestamp,
             cancellationToken);
     }
-    
+
     /// <summary>
     /// Fetches best bid/ask from the real Coinbase API
     /// </summary>

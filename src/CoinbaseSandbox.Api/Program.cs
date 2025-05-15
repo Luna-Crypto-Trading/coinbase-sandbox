@@ -66,8 +66,8 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "A sandbox API that mimics the Coinbase Advanced Trade API but only mocks order execution, account balances, and wallet operations"
     });
-    
-    // Define the security scheme for API key authentication
+
+    // Define the security schemes for API key and Bearer token authentication
     c.AddSecurityDefinition("CoinbaseApiKey", new OpenApiSecurityScheme
     {
         Description = "Coinbase API Key authentication using the CB-ACCESS-KEY header",
@@ -76,9 +76,19 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "ApiKeyScheme"
     });
-    
-    // Add Security requirement for all operations
-    var scheme = new OpenApiSecurityScheme
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    // Add Security requirements for all operations
+    var apiKeyScheme = new OpenApiSecurityScheme
     {
         Reference = new OpenApiReference
         {
@@ -87,11 +97,22 @@ builder.Services.AddSwaggerGen(c =>
         },
         In = ParameterLocation.Header
     };
-    
+
+    var bearerScheme = new OpenApiSecurityScheme
+    {
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { scheme, new string[] { } }
+        { apiKeyScheme, new string[] { } },
+        { bearerScheme, new string[] { } }
     });
+
 });
 
 var app = builder.Build();
@@ -152,11 +173,11 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    
+
     var productRepository = services.GetRequiredService<IProductRepository>();
     var walletRepository = services.GetRequiredService<IWalletRepository>();
     var priceRepository = services.GetRequiredService<IPriceRepository>();
-    
+
     await SeedData.InitializeAsync(productRepository, walletRepository, priceRepository);
 }
 
