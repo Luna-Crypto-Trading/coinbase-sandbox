@@ -59,13 +59,7 @@ public class AdvancedTradeController(
         public bool Success { get; set; } = true;
     }
 
-    /// <summary>
-    // /// Gets the best bid and ask prices for the specified product IDs
-    // /// </summary>
-    // /// <param name="productIds">List of product IDs (e.g., "BTC-USD", "ETH-USD")</param>
-    // /// <param name="cancellationToken">Cancellation token</param>
-    // /// <returns>The best bid and ask data for each product</returns>
-    // [HttpGet("best_bid_ask")]
+    
     [HttpGet("best_bid_ask")]
     public async Task<IActionResult> GetBestBidAsk(
         [FromQuery(Name = "product_ids")] List<string>? productIds = null,
@@ -122,57 +116,7 @@ public class AdvancedTradeController(
         }
     }
 
-    private async Task<IActionResult> GetMockBestBidAskAsync(
-        List<string> productIds,
-        CancellationToken cancellationToken)
-    {
-        var response = new BestBidAskResponse
-        {
-            Pricebooks = new List<BestBidAskData>(),
-            Success = true
-        };
-
-        foreach (var productId in productIds)
-        {
-            try
-            {
-                // Get current price for the product
-                var currentPrice = await priceService.GetCurrentPriceAsync(productId, cancellationToken);
-
-                // Create simulated bid and ask prices (bid slightly lower, ask slightly higher)
-                decimal bidPrice = currentPrice * 0.999m; // 0.1% below current price
-                decimal askPrice = currentPrice * 1.001m; // 0.1% above current price
-
-                // Generate random sizes
-                var random = new Random();
-                decimal bidSize = Math.Round(0.1m + (decimal)random.NextDouble() * 2, 6);
-                decimal askSize = Math.Round(0.1m + (decimal)random.NextDouble() * 2, 6);
-
-                response.Pricebooks.Add(new BestBidAskData
-                {
-                    ProductId = productId,
-                    Bid = new BidAskDetail
-                    {
-                        Price = bidPrice.ToString("F2"),
-                        Size = bidSize.ToString("F6")
-                    },
-                    Ask = new BidAskDetail
-                    {
-                        Price = askPrice.ToString("F2"),
-                        Size = askSize.ToString("F6")
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "Error getting mock best bid/ask for {ProductId}", productId);
-                // Skip this product if there's an error
-            }
-        }
-
-        return Ok(response);
-    }
-
+    
     // GET /api/v3/brokerage/products
     [HttpGet("products")]
     public async Task<IActionResult> GetProducts(CancellationToken cancellationToken)
@@ -621,6 +565,56 @@ public class AdvancedTradeController(
     }
 
     #endregion
+    private async Task<IActionResult> GetMockBestBidAskAsync(
+        List<string> productIds,
+        CancellationToken cancellationToken)
+    {
+        var response = new BestBidAskResponse
+        {
+            Pricebooks = new List<BestBidAskData>(),
+            Success = true
+        };
+
+        foreach (var productId in productIds)
+        {
+            try
+            {
+                // Get current price for the product
+                var currentPrice = await priceService.GetCurrentPriceAsync(productId, cancellationToken);
+
+                // Create simulated bid and ask prices (bid slightly lower, ask slightly higher)
+                decimal bidPrice = currentPrice * 0.999m; // 0.1% below current price
+                decimal askPrice = currentPrice * 1.001m; // 0.1% above current price
+
+                // Generate random sizes
+                var random = new Random();
+                decimal bidSize = Math.Round(0.1m + (decimal)random.NextDouble() * 2, 6);
+                decimal askSize = Math.Round(0.1m + (decimal)random.NextDouble() * 2, 6);
+
+                response.Pricebooks.Add(new BestBidAskData
+                {
+                    ProductId = productId,
+                    Bid = new BidAskDetail
+                    {
+                        Price = bidPrice.ToString("F2"),
+                        Size = bidSize.ToString("F6")
+                    },
+                    Ask = new BidAskDetail
+                    {
+                        Price = askPrice.ToString("F2"),
+                        Size = askSize.ToString("F6")
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Error getting mock best bid/ask for {ProductId}", productId);
+                // Skip this product if there's an error
+            }
+        }
+
+        return Ok(response);
+    }
 
     #region Accounts (Mocked locally)
 
