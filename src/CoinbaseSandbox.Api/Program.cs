@@ -46,6 +46,9 @@ builder.Services.AddScoped<IPriceService, PriceService>();
 builder.Services.AddScoped<IBacktestService, BacktestService>();
 builder.Services.AddScoped<ITechnicalAnalysisService, TechnicalAnalysisService>();
 
+// Add API-specific services
+builder.Services.AddScoped<CoinbaseSandbox.Api.Services.IOrderConfigurationParser, CoinbaseSandbox.Api.Services.OrderConfigurationParser>();
+
 // Add infrastructure services
 builder.Services.AddSingleton<IEventPublisher, InMemoryEventPublisher>();
 builder.Services.AddSingleton<INotificationService, NotificationService>();

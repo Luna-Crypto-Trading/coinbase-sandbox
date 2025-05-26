@@ -1,0 +1,429 @@
+openapi: 3.0.3
+info:
+  title: Coinbase Brokerage API
+  description: API for creating orders on Coinbase trading platform
+  version: "3.0"
+  contact:
+    name: Coinbase API Support
+    url: https://help.coinbase.com/
+  license:
+    name: Coinbase Terms of Service
+    url: https://www.coinbase.com/legal/user_agreement
+
+servers:
+  - url: https://api.coinbase.com/api/v3
+    description: Production server
+
+paths:
+  /brokerage/orders:
+    post:
+      summary: Create an order
+      description: Create an order with a specified product_id (asset-pair), side (buy/sell), and order configuration
+      operationId: createOrder
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+            examples:
+              market_order:
+                summary: Market Order Example
+                value:
+                  client_order_id: "0000-00000-000000"
+                  product_id: "BTC-USD"
+                  side: "BUY"
+                  order_configuration:
+                    market_market_ioc:
+                      quote_size: "10.00"
+              limit_order:
+                summary: Limit Order Example
+                value:
+                  client_order_id: "0001-00001-000001"
+                  product_id: "BTC-USD"
+                  side: "BUY"
+                  order_configuration:
+                    limit_limit_gtc:
+                      base_size: "0.001"
+                      limit_price: "10000.00"
+                      post_only: false
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  order:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad request - Invalid parameters
+        '401':
+          description: Unauthorized - Invalid API credentials
+        '403':
+          description: Forbidden - Insufficient permissions
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required:
+        - client_order_id
+        - product_id
+        - side
+        - order_configuration
+      properties:
+        client_order_id:
+          type: string
+          description: A unique ID provided for the order (used for identification purposes). If the ID provided is not unique, the order will not be created and the order corresponding with that ID will be returned instead.
+          example: "0000-00000-000000"
+        product_id:
+          type: string
+          description: The trading pair (e.g. 'BTC-USD')
+          example: "BTC-USD"
+        side:
+          type: string
+          enum: [BUY, SELL]
+          description: The side of the market that the order is on
+        order_configuration:
+          $ref: '#/components/schemas/OrderConfiguration'
+        leverage:
+          type: string
+          description: The amount of leverage for the order (default is 1.0)
+          example: "2.0"
+        margin_type:
+          type: string
+          enum: [CROSS, ISOLATED]
+          description: Margin Type for this order (default is CROSS)
+        retail_portfolio_id:
+          type: string
+          description: Portfolio to place the order from and only applicable for OAuth connections. API keys will use the key's permissioned portfolio.
+          example: "11111111-1111-1111-1111-111111111111"
+        preview_id:
+          type: string
+          description: Preview ID for this order, to associate this order with a preview request
+          example: "b40bbff9-17ce-4726-8b64-9de7ae57ad26"
+        attached_order_configuration:
+          $ref: '#/components/schemas/AttachedOrderConfiguration'
+
+    OrderConfiguration:
+      type: object
+      description: The configuration of the order (e.g. the order type, size, etc)
+      oneOf:
+        - $ref: '#/components/schemas/MarketMarketIoc'
+        - $ref: '#/components/schemas/SorLimitIoc'
+        - $ref: '#/components/schemas/LimitLimitGtc'
+        - $ref: '#/components/schemas/LimitLimitGtd'
+        - $ref: '#/components/schemas/LimitLimitFok'
+        - $ref: '#/components/schemas/TwapLimitGtd'
+        - $ref: '#/components/schemas/StopLimitStopLimitGtc'
+        - $ref: '#/components/schemas/StopLimitStopLimitGtd'
+        - $ref: '#/components/schemas/TriggerBracketGtc'
+        - $ref: '#/components/schemas/TriggerBracketGtd'
+
+    AttachedOrderConfiguration:
+      type: object
+      description: The configuration of the attached order. Only TriggerBracketGtc is eligible. Size field must be omitted as the size of the attached order is the same as that of the parent order.
+      oneOf:
+        - $ref: '#/components/schemas/MarketMarketIoc'
+        - $ref: '#/components/schemas/SorLimitIoc'
+        - $ref: '#/components/schemas/LimitLimitGtc'
+        - $ref: '#/components/schemas/LimitLimitGtd'
+        - $ref: '#/components/schemas/LimitLimitFok'
+        - $ref: '#/components/schemas/TwapLimitGtd'
+        - $ref: '#/components/schemas/StopLimitStopLimitGtc'
+        - $ref: '#/components/schemas/StopLimitStopLimitGtd'
+        - $ref: '#/components/schemas/TriggerBracketGtc'
+        - $ref: '#/components/schemas/TriggerBracketGtd'
+
+    MarketMarketIoc:
+      type: object
+      description: Buy or sell a specified quantity of an Asset at the current best available market price
+      properties:
+        market_market_ioc:
+          type: object
+          properties:
+            quote_size:
+              type: string
+              description: The amount of the second Asset in the Trading Pair. For example, on the BTC/USD Order Book, USD is the Quote Asset.
+              example: "10.00"
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair. For example, on the BTC-USD Order Book, BTC is the Base Asset.
+              example: "0.001"
+
+    SorLimitIoc:
+      type: object
+      description: Buy or sell a specified quantity of an Asset at a specified price. The Order will only post to the Order Book if it will immediately Fill; any remaining quantity is canceled.
+      properties:
+        sor_limit_ioc:
+          type: object
+          properties:
+            quote_size:
+              type: string
+              description: The amount of the second Asset in the Trading Pair
+              example: "10.00"
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+
+    LimitLimitGtc:
+      type: object
+      description: Buy or sell a specified quantity of an Asset at a specified price. If posted, the Order will remain on the Order Book until canceled.
+      properties:
+        limit_limit_gtc:
+          type: object
+          properties:
+            quote_size:
+              type: string
+              description: The amount of the second Asset in the Trading Pair
+              example: "10.00"
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+            post_only:
+              type: boolean
+              description: Enable or disable Post-only Mode. When enabled, only Maker Orders will be posted to the Order Book.
+
+    LimitLimitGtd:
+      type: object
+      description: Buy or sell a specified quantity of an Asset at a specified price. If posted, the Order will remain on the Order Book until a certain time is reached or the Order is canceled.
+      properties:
+        limit_limit_gtd:
+          type: object
+          properties:
+            quote_size:
+              type: string
+              description: The amount of the second Asset in the Trading Pair
+              example: "10.00"
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+            end_time:
+              type: string
+              format: date-time
+              description: The time at which the order will be cancelled if it is not Filled (RFC3339 Timestamp)
+              example: "2021-05-31T09:59:59Z"
+            post_only:
+              type: boolean
+              description: Enable or disable Post-only Mode
+
+    LimitLimitFok:
+      type: object
+      description: Buy or sell a specified quantity of an Asset at a specified price. The Order will only post to the Order Book if it is to immediately and completely Fill.
+      properties:
+        limit_limit_fok:
+          type: object
+          properties:
+            quote_size:
+              type: string
+              description: The amount of the second Asset in the Trading Pair
+              example: "10.00"
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+
+    TwapLimitGtd:
+      type: object
+      description: A time-weighted average price (TWAP) order type that calculates the average price of a product to programmatically execute an order over a specified duration.
+      properties:
+        twap_limit_gtd:
+          type: object
+          properties:
+            quote_size:
+              type: string
+              description: The amount of the second Asset in the Trading Pair
+              example: "10.00"
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            start_time:
+              type: string
+              format: date-time
+              description: Time at which the order should begin executing (RFC3339 Timestamp)
+              example: "2021-05-31T07:59:59Z"
+            end_time:
+              type: string
+              format: date-time
+              description: The time at which the order will be cancelled if it is not Filled (RFC3339 Timestamp)
+              example: "2021-05-31T09:59:59Z"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+            number_buckets:
+              type: string
+              description: The number of smaller buckets/suborders over which the entire order will be broken into
+              example: "5"
+            bucket_size:
+              type: string
+              description: The size of each suborder. bucket_size multiplied by number_buckets should match the size of the entire twap order
+              example: "2.00"
+            bucket_duration:
+              type: string
+              description: The duration over which each sub order was executed
+              example: "300s"
+
+    StopLimitStopLimitGtc:
+      type: object
+      description: Posts an Order to buy or sell a specified quantity of an Asset, but only if and when the last trade price on the Order Book equals or surpasses the Stop Price. If posted, the Order will remain on the Order Book until canceled.
+      properties:
+        stop_limit_stop_limit_gtc:
+          type: object
+          properties:
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+            stop_price:
+              type: string
+              description: The specified price that will trigger the placement of the Order
+              example: "20000.00"
+            stop_direction:
+              type: string
+              enum: [STOP_DIRECTION_STOP_UP, STOP_DIRECTION_STOP_DOWN]
+              description: The direction of the stop limit Order
+
+    StopLimitStopLimitGtd:
+      type: object
+      description: Posts an Order to buy or sell a specified quantity of an Asset, but only if and when the last trade price on the Order Book equals or surpasses the Stop Price. If posted, the Order will remain on the Order Book until a certain time is reached.
+      properties:
+        stop_limit_stop_limit_gtd:
+          type: object
+          properties:
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+            stop_price:
+              type: string
+              description: The specified price that will trigger the placement of the Order
+              example: "20000.00"
+            end_time:
+              type: string
+              format: date-time
+              description: The time at which the order will be cancelled if it is not Filled (RFC3339 Timestamp)
+              example: "2021-05-31T09:59:59Z"
+            stop_direction:
+              type: string
+              enum: [STOP_DIRECTION_STOP_UP, STOP_DIRECTION_STOP_DOWN]
+              description: The direction of the stop limit Order
+
+    TriggerBracketGtc:
+      type: object
+      description: A Limit Order to buy or sell a specified quantity of an Asset at a specified price, with stop limit order parameters embedded in the order. If posted, the Order will remain on the Order Book until canceled.
+      properties:
+        trigger_bracket_gtc:
+          type: object
+          properties:
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+            stop_trigger_price:
+              type: string
+              description: The price level (in quote currency) where the position will be exited. When triggered, a stop limit order is automatically placed with a limit price 5% higher for BUYS and 5% lower for SELLS.
+              example: "20000.00"
+
+    TriggerBracketGtd:
+      type: object
+      description: A Limit Order to buy or sell a specified quantity of an Asset at a specified price, with stop limit order parameters embedded in the order. If posted, the Order will remain on the Order Book until a certain time is reached or the Order is canceled.
+      properties:
+        trigger_bracket_gtd:
+          type: object
+          properties:
+            base_size:
+              type: string
+              description: The amount of the first Asset in the Trading Pair
+              example: "0.001"
+            limit_price:
+              type: string
+              description: The specified price, or better, that the Order should be executed at
+              example: "10000.00"
+            stop_trigger_price:
+              type: string
+              description: The price level (in quote currency) where the position will be exited
+              example: "20000.00"
+            end_time:
+              type: string
+              format: date-time
+              description: The time at which the order will be cancelled if it is not Filled (RFC3339 Timestamp)
+              example: "2021-05-31T09:59:59Z"
+
+    Order:
+      type: object
+      description: Order response object
+      properties:
+        order_id:
+          type: string
+          description: Unique identifier for the order
+        client_order_id:
+          type: string
+          description: Client-provided unique identifier
+        product_id:
+          type: string
+          description: Trading pair
+        side:
+          type: string
+          enum: [BUY, SELL]
+        status:
+          type: string
+          description: Current status of the order
+        created_time:
+          type: string
+          format: date-time
+          description: Time when order was created
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: API key for authentication
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Orders
+    description: Order management operations

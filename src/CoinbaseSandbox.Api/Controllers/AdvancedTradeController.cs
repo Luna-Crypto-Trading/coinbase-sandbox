@@ -22,6 +22,7 @@ public class AdvancedTradeController(
     IPriceService priceService,
     IWalletService walletService,
     CoinbaseApiClient coinbaseApiClient,
+    Services.IOrderConfigurationParser orderConfigurationParser,
     ILogger<AdvancedTradeController> logger)
     : ControllerBase
 {
@@ -295,44 +296,34 @@ public class AdvancedTradeController(
 
     // POST /api/v3/brokerage/orders
     [HttpPost("orders")]
-    public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateOrder([FromBody] Models.CreateOrderRequest request, CancellationToken cancellationToken)
     {
         try
         {
+            // Validate required fields
+            if (string.IsNullOrEmpty(request.ClientOrderId))
+            {
+                return BadRequest(new { error = "client_order_id is required" });
+            }
+
+            if (string.IsNullOrEmpty(request.ProductId))
+            {
+                return BadRequest(new { error = "product_id is required" });
+            }
+
+            if (string.IsNullOrEmpty(request.Side))
+            {
+                return BadRequest(new { error = "side is required" });
+            }
+
             // Parse side
-            if (!Enum.TryParse<OrderSide>(request.side, true, out var side))
+            if (!Enum.TryParse<OrderSide>(request.Side, true, out var side))
             {
-                return BadRequest(new { error = $"Invalid order side: {request.side}" });
+                return BadRequest(new { error = $"Invalid order side: {request.Side}" });
             }
 
-            // Parse type
-            if (!Enum.TryParse<OrderType>(request.order_type, true, out var type))
-            {
-                return BadRequest(new { error = $"Invalid order type: {request.order_type}" });
-            }
-
-            // Validate limit price for limit orders
-            decimal? limitPrice = null;
-            if (type == OrderType.Limit)
-            {
-                if (string.IsNullOrEmpty(request.limit_price))
-                {
-                    return BadRequest(new { error = "Limit price is required for limit orders" });
-                }
-
-                if (!decimal.TryParse(request.limit_price, out var parsedLimitPrice))
-                {
-                    return BadRequest(new { error = $"Invalid limit price: {request.limit_price}" });
-                }
-
-                limitPrice = parsedLimitPrice;
-            }
-
-            // Parse size
-            if (!decimal.TryParse(request.base_size, out var size))
-            {
-                return BadRequest(new { error = $"Invalid base size: {request.base_size}" });
-            }
+            // Parse order configuration
+            var (type, size, limitPrice, timeInForce, endTime) = orderConfigurationParser.ParseOrderConfiguration(request.OrderConfiguration, request.Side);
 
             // Attempt to get current market price from real API for the product
             decimal executionPrice = 0;
@@ -341,7 +332,7 @@ public class AdvancedTradeController(
                 if (TryGetAuthHeaders(out var accessKey, out var accessSign, out var accessTimestamp))
                 {
                     var tickerData = await coinbaseApiClient.GetMarketTradesAsync<JsonElement>(
-                        request.product_id,
+                        request.ProductId,
                         accessKey,
                         accessSign,
                         accessTimestamp,
@@ -355,13 +346,13 @@ public class AdvancedTradeController(
                         executionPrice = price;
 
                         // Update our local price record with the current market price
-                        await priceService.SetMockPriceAsync(request.product_id, executionPrice, cancellationToken);
+                        await priceService.SetMockPriceAsync(request.ProductId, executionPrice, cancellationToken);
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Error fetching current price for {ProductId} from real API, using local price", request.product_id);
+                logger.LogWarning(ex, "Error fetching current price for {ProductId} from real API, using local price", request.ProductId);
             }
 
             // Fall back to local price if we couldn't get it from the real API
@@ -369,19 +360,19 @@ public class AdvancedTradeController(
             {
                 try
                 {
-                    executionPrice = await priceService.GetCurrentPriceAsync(request.product_id, cancellationToken);
+                    executionPrice = await priceService.GetCurrentPriceAsync(request.ProductId, cancellationToken);
                 }
                 catch
                 {
                     // If no price is available locally, use a mock price
                     executionPrice = 50000.00m; // Default price for testing
-                    await priceService.SetMockPriceAsync(request.product_id, executionPrice, cancellationToken);
+                    await priceService.SetMockPriceAsync(request.ProductId, executionPrice, cancellationToken);
                 }
             }
 
             // Place the order in our local system
             var order = await orderService.PlaceOrderAsync(
-                request.product_id,
+                request.ProductId,
                 side,
                 type,
                 size,
@@ -389,23 +380,17 @@ public class AdvancedTradeController(
                 cancellationToken);
 
             // Format response to match Coinbase API format
-            var response = new
+            var response = new Models.CreateOrderResponse
             {
-                success = true,
-                order_id = order.Id.ToString(),
-                order_configuration = new
+                Success = true,
+                Order = new Models.OrderResponse
                 {
-                    order_id = order.Id.ToString(),
-                    product_id = order.ProductId,
-                    side = order.Side.ToString().ToLower(),
-                    order_type = order.Type.ToString().ToLower(),
-                    status = order.Status.ToString().ToLower(),
-                    created_time = order.CreatedAt.ToString("o"),
-                    base_size = order.Size.ToString(),
-                    limit_price = order.LimitPrice?.ToString(),
-                    filled_size = order.Status == OrderStatus.Filled ? order.Size.ToString() : "0",
-                    filled_price = order.ExecutedPrice?.ToString(),
-                    fee = order.Fee?.ToString()
+                    OrderId = order.Id.ToString(),
+                    ClientOrderId = request.ClientOrderId,
+                    ProductId = order.ProductId,
+                    Side = order.Side.ToString().ToUpper(),
+                    Status = order.Status.ToString().ToLower(),
+                    CreatedTime = order.CreatedAt.ToString("o")
                 }
             };
 
@@ -425,15 +410,7 @@ public class AdvancedTradeController(
         }
     }
 
-    public class CreateOrderRequest
-    {
-        public string client_order_id { get; set; } = Guid.NewGuid().ToString();
-        public string product_id { get; set; } = string.Empty;
-        public string side { get; set; } = string.Empty;
-        public string order_type { get; set; } = string.Empty;
-        public string base_size { get; set; } = string.Empty;
-        public string limit_price { get; set; } = string.Empty;
-    }
+
 
     // GET /api/v3/brokerage/orders/historical/{order_id}
     [HttpGet("orders/historical/{orderId}")]

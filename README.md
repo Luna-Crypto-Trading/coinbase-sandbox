@@ -43,6 +43,12 @@ services:
       - coinbase-sandbox
 ```
 
+## 📖 Documentation
+
+- **[Complete Feature Documentation](SANDBOX_FEATURES.md)** - Comprehensive guide to all sandbox features and API endpoints
+- **[Setup Guide](setup_guide.md)** - Detailed setup and configuration instructions
+- **[WebSocket Tester](websocker-tester.html)** - Interactive WebSocket testing tool
+
 ## Features
 
 ### 🔄 API Compatibility

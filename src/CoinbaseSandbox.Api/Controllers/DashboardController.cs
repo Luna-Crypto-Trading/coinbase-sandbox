@@ -18,6 +18,7 @@ public class DashboardController(IWebHostEnvironment environment) : ControllerBa
         return PhysicalFile(path, "text/html");
     }
 
+    [HttpGet("")]
     [HttpGet("dashboard")]
     public IActionResult GetDashboard()
     {
@@ -28,11 +29,5 @@ public class DashboardController(IWebHostEnvironment environment) : ControllerBa
         }
 
         return PhysicalFile(path, "text/html");
-    }
-
-    [HttpGet("")]
-    public IActionResult Index()
-    {
-        return Redirect("/api/dashboard/websocket-tester");
     }
 }

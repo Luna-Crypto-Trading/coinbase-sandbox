@@ -3,1259 +3,1509 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coinbase Sandbox Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <title>Coinbase Sandbox - Trading Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #0052cc;
-            --secondary-color: #00cc52;
-            --danger-color: #cc0000;
-            --background-color: #f7f9fc;
-            --card-color: #ffffff;
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --bg-card: #1c2128;
+            --border-color: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #656d76;
+            --accent-primary: #238636;
+            --accent-secondary: #1f6feb;
+            --accent-danger: #da3633;
+            --accent-warning: #fb8500;
+            --accent-success: #238636;
+            --gradient-primary: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: var(--background-color);
-            color: #333;
-            padding-top: 56px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--bg-secondary) !important;
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
         }
 
         .navbar-brand {
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary) !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
+        .navbar-brand i {
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Cards */
         .card {
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            background-color: var(--card-color);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .card-header {
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1rem 1.25rem;
             font-weight: 600;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            background-color: rgba(0, 82, 204, 0.05);
-            padding: 12px 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a5cd8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--accent-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--accent-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: var(--accent-warning);
+            color: white;
+        }
+
+        .btn-outline-light {
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            background: transparent;
+        }
+
+        .btn-outline-light:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--accent-secondary);
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: var(--bg-tertiary);
+            border-color: var(--accent-secondary);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(31, 111, 235, 0.25);
+        }
+
+        .form-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-check-input {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+        }
+
+        .form-check-label {
+            color: var(--text-secondary);
+        }
+
+        /* Price Display */
         .price-display {
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 2.5rem;
+            font-weight: 700;
             text-align: center;
-            margin: 10px 0;
-            color: var(--primary-color);
+            margin: 1rem 0;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .price-change {
-            font-size: 16px;
+            font-size: 1.1rem;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 1rem;
+            font-weight: 500;
         }
 
         .price-change.positive {
-            color: var(--secondary-color);
+            color: var(--accent-success);
         }
 
         .price-change.negative {
-            color: var(--danger-color);
+            color: var(--accent-danger);
         }
 
+        /* Status Indicators */
+        .connection-status {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .connection-status.connected {
+            background: rgba(35, 134, 54, 0.2);
+            color: var(--accent-success);
+            border: 1px solid var(--accent-success);
+        }
+
+        .connection-status.disconnected {
+            background: rgba(218, 54, 51, 0.2);
+            color: var(--accent-danger);
+            border: 1px solid var(--accent-danger);
+        }
+
+        .connection-status i {
+            font-size: 0.75rem;
+        }
+
+        /* Tables */
+        .table {
+            color: var(--text-primary);
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-color: var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            border-color: var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Order Book */
+        .order-book-asks {
+            color: var(--accent-danger);
+        }
+
+        .order-book-bids {
+            color: var(--accent-success);
+        }
+
+        .spread-row {
+            background: var(--bg-tertiary) !important;
+            font-weight: 600;
+        }
+
+        /* Trade History */
+        .trade-buy {
+            color: var(--accent-success);
+        }
+
+        .trade-sell {
+            color: var(--accent-danger);
+        }
+
+        /* Technical Indicators */
+        .indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .indicator:last-child {
+            border-bottom: none;
+        }
+
+        .indicator-name {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .indicator-value {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .indicator-value.positive {
+            color: var(--accent-success);
+        }
+
+        .indicator-value.negative {
+            color: var(--accent-danger);
+        }
+
+        /* Message Log */
         .message-log {
             height: 400px;
             overflow-y: auto;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            font-family: monospace;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
         }
 
         .message {
-            padding: 8px;
-            margin-bottom: 8px;
-            border-radius: 4px;
-            border-left: 4px solid #ddd;
-            background-color: #f8f9fa;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--border-color);
+            background: var(--bg-secondary);
             white-space: pre-wrap;
             overflow-wrap: break-word;
         }
 
         .message.sent {
-            border-left-color: var(--primary-color);
+            border-left-color: var(--accent-secondary);
+            background: rgba(31, 111, 235, 0.1);
         }
 
         .message.received {
-            border-left-color: var(--secondary-color);
+            border-left-color: var(--accent-success);
+            background: rgba(35, 134, 54, 0.1);
         }
 
         .message.error {
-            border-left-color: var(--danger-color);
-            background-color: #fff8f8;
+            border-left-color: var(--accent-danger);
+            background: rgba(218, 54, 51, 0.1);
         }
 
-        .order-book-table {
-            font-size: 14px;
-        }
-
-        .order-book-table th, .order-book-table td {
-            padding: 0.25rem 0.5rem;
-        }
-
-        .order-book-asks {
-            color: var(--danger-color);
-        }
-
-        .order-book-bids {
-            color: var(--secondary-color);
-        }
-
+        /* Chart Container */
         #chart {
             height: 400px;
             width: 100%;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
+        /* Sidebar */
         .sidebar {
             position: sticky;
             top: 76px;
             height: calc(100vh - 76px);
             overflow-y: auto;
+            padding-right: 0.5rem;
         }
 
-        .indicator {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .indicator-name {
-            font-weight: 500;
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 3px;
         }
 
-        .indicator-value {
-            font-weight: 600;
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
         }
 
-        .indicator-value.positive {
-            color: var(--secondary-color);
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
         }
 
-        .indicator-value.negative {
-            color: var(--danger-color);
-        }
-
+        /* Alert Banner */
         .alert-banner {
-            padding: 8px 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .trade-history-table {
-            font-size: 14px;
+        .alert-success {
+            background: rgba(35, 134, 54, 0.2);
+            color: var(--accent-success);
+            border: 1px solid var(--accent-success);
         }
 
-        .trade-history-table th, .trade-history-table td {
-            padding: 0.25rem 0.5rem;
+        /* Price Cards */
+        .price-card {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
         }
 
-        .trade-buy {
-            color: var(--secondary-color);
+        .price-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-secondary);
         }
 
-        .trade-sell {
-            color: var(--danger-color);
+        .price-card .symbol {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
+        .price-card .price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Active Subscriptions */
         .active-subscriptions {
-            background-color: rgba(0, 82, 204, 0.05);
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
         }
 
-        .active-subscriptions ul {
+        .subscription-item {
+            background: var(--bg-secondary);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid var(--border-color);
+        }
+
+        .subscription-item:last-child {
             margin-bottom: 0;
         }
 
-        .simulation-controls {
-            margin-top: 15px;
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                height: auto;
+            }
+            
+            .price-display {
+                font-size: 2rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
         }
 
-        .connection-status {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 50px;
-            margin-left: 10px;
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--accent-secondary);
+            animation: spin 1s ease-in-out infinite;
         }
 
-        .connection-status.connected {
-            background-color: #e6f7e6;
-            color: #1e7e34;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .connection-status.disconnected {
-            background-color: #f8d7da;
-            color: #721c24;
+        /* Utility Classes */
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(28, 33, 40, 0.8);
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <i class="bi bi-currency-bitcoin me-2"></i>
-            Coinbase Sandbox Dashboard
-        </a>
-        <div class="d-flex align-items-center">
-            <span id="connection-status" class="connection-status disconnected">Disconnected</span>
-            <button class="btn btn-outline-light ms-2" id="connect-button">Connect</button>
-            <button class="btn btn-outline-light ms-2" id="disconnect-button" disabled>Disconnect</button>
-        </div>
-    </div>
-</nav>
-
-<div class="container-fluid mt-4">
-    <div class="row">
-        <!-- Left Sidebar - Controls and Subscriptions -->
-        <div class="col-md-3 sidebar">
-            <div class="card">
-                <div class="card-header">
-                    <i class="bi bi-gear me-2"></i>WebSocket Controls
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label for="ws-url" class="form-label">WebSocket URL:</label>
-                        <input type="text" class="form-control" id="ws-url" value="ws://localhost:5226/ws">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="product-id" class="form-label">Product:</label>
-                        <select class="form-select" id="product-id">
-                            <option value="BTC-USD">BTC-USD</option>
-                            <option value="ETH-USD">ETH-USD</option>
-                            <option value="SOL-USD">SOL-USD</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Channels:</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="ticker" id="channel-ticker" checked>
-                            <label class="form-check-label" for="channel-ticker">
-                                Ticker
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="level2" id="channel-level2">
-                            <label class="form-check-label" for="channel-level2">
-                                Order Book (Level 2)
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="heartbeat" id="channel-heartbeat">
-                            <label class="form-check-label" for="channel-heartbeat">
-                                Heartbeat
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-primary" id="subscribe-button" disabled>Subscribe</button>
-                        <button class="btn btn-danger" id="unsubscribe-button" disabled>Unsubscribe</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <i class="bi bi-list-check me-2"></i>Active Subscriptions
-                </div>
-                <div class="card-body active-subscriptions" id="subscriptions">
-                    <p class="text-muted">No active subscriptions</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <i class="bi bi-graph-up me-2"></i>Price Simulation
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label for="simulation-type" class="form-label">Simulation Type:</label>
-                        <select class="form-select" id="simulation-type">
-                            <option value="trend">Trend</option>
-                            <option value="volatility">Volatility</option>
-                        </select>
-                    </div>
-
-                    <div id="trend-options">
-                        <div class="mb-3">
-                            <label for="start-price" class="form-label">Start Price:</label>
-                            <input type="number" class="form-control" id="start-price" value="50000.00" step="0.01">
-                        </div>
-                        <div class="mb-3">
-                            <label for="end-price" class="form-label">End Price:</label>
-                            <input type="number" class="form-control" id="end-price" value="55000.00" step="0.01">
-                        </div>
-                    </div>
-
-                    <div id="volatility-options" style="display: none;">
-                        <div class="mb-3">
-                            <label for="base-price" class="form-label">Base Price:</label>
-                            <input type="number" class="form-control" id="base-price" value="50000.00" step="0.01">
-                        </div>
-                        <div class="mb-3">
-                            <label for="volatility-percent" class="form-label">Volatility %:</label>
-                            <input type="number" class="form-control" id="volatility-percent" value="2.0" step="0.1" min="0.1" max="20">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="duration" class="form-label">Duration (seconds):</label>
-                        <input type="number" class="form-control" id="duration" value="60" min="10">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="repeat" class="form-label">Repeat:</label>
-                        <select class="form-select" id="repeat">
-                            <option value="false">No</option>
-                            <option value="true">Yes</option>
-                        </select>
-                    </div>
-
-                    <div class="d-grid gap-2 simulation-controls">
-                        <button class="btn btn-success" id="start-simulation">Start Simulation</button>
-                        <button class="btn btn-warning" id="stop-simulation">Stop Simulation</button>
-                    </div>
-                </div>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-currency-bitcoin"></i>
+                Coinbase Sandbox
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <span id="connection-status" class="connection-status disconnected">
+                    <i class="bi bi-circle-fill"></i>
+                    Disconnected
+                </span>
+                <button class="btn btn-outline-light btn-sm" id="connect-button">
+                    <i class="bi bi-plug me-1"></i>Connect
+                </button>
+                <button class="btn btn-outline-light btn-sm" id="disconnect-button" disabled>
+                    <i class="bi bi-plug-fill me-1"></i>Disconnect
+                </button>
             </div>
         </div>
+    </nav>
 
-        <!-- Main Content -->
-        <div class="col-md-6">
-            <!-- Price Display -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-currency-exchange me-2"></i>BTC-USD</span>
-                    <span class="text-muted" id="update-time">Last update: Never</span>
+    <!-- Main Content -->
+    <div class="container-fluid" style="padding-top: 80px;">
+        <div class="row">
+            <!-- Left Sidebar - Controls -->
+            <div class="col-lg-3 sidebar">
+                <!-- WebSocket Controls -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-wifi"></i>
+                        Connection Settings
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="ws-url" class="form-label">WebSocket URL</label>
+                            <input type="text" class="form-control" id="ws-url" value="ws://localhost:5000/ws">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="product-id" class="form-label">Trading Pair</label>
+                            <select class="form-select" id="product-id">
+                                <option value="BTC-USD">BTC-USD</option>
+                                <option value="ETH-USD">ETH-USD</option>
+                                <option value="SOL-USD">SOL-USD</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Data Channels</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="ticker" id="channel-ticker" checked>
+                                <label class="form-check-label" for="channel-ticker">
+                                    Price Ticker
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="level2" id="channel-level2">
+                                <label class="form-check-label" for="channel-level2">
+                                    Order Book (Level 2)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="heartbeat" id="channel-heartbeat">
+                                <label class="form-check-label" for="channel-heartbeat">
+                                    Heartbeat
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" id="subscribe-button" disabled>
+                                <i class="bi bi-play-circle me-1"></i>Subscribe
+                            </button>
+                            <button class="btn btn-danger" id="unsubscribe-button" disabled>
+                                <i class="bi bi-stop-circle me-1"></i>Unsubscribe
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="price-display" id="current-price">$0.00</div>
-                    <div class="price-change" id="price-change">0.00% (0.00)</div>
 
-                    <div class="alert-banner alert-success mt-3" role="alert" id="price-alert" style="display: none;">
-                        <i class="bi bi-bell me-2"></i><span id="alert-message"></span>
+                <!-- Active Subscriptions -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-list-check"></i>
+                        Active Subscriptions
+                    </div>
+                    <div class="card-body">
+                        <div class="active-subscriptions" id="subscriptions">
+                            <p class="text-muted mb-0">No active subscriptions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Simulation -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Price Simulation
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="simulation-type" class="form-label">Simulation Type</label>
+                            <select class="form-select" id="simulation-type">
+                                <option value="trend">Trend Movement</option>
+                                <option value="volatility">Volatility Simulation</option>
+                            </select>
+                        </div>
+
+                        <div id="trend-options">
+                            <div class="mb-3">
+                                <label for="start-price" class="form-label">Start Price ($)</label>
+                                <input type="number" class="form-control" id="start-price" value="50000.00" step="0.01">
+                            </div>
+                            <div class="mb-3">
+                                <label for="end-price" class="form-label">End Price ($)</label>
+                                <input type="number" class="form-control" id="end-price" value="55000.00" step="0.01">
+                            </div>
+                        </div>
+
+                        <div id="volatility-options" style="display: none;">
+                            <div class="mb-3">
+                                <label for="base-price" class="form-label">Base Price ($)</label>
+                                <input type="number" class="form-control" id="base-price" value="50000.00" step="0.01">
+                            </div>
+                            <div class="mb-3">
+                                <label for="volatility-percent" class="form-label">Volatility (%)</label>
+                                <input type="number" class="form-control" id="volatility-percent" value="2.0" step="0.1" min="0.1" max="20">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="duration" class="form-label">Duration (seconds)</label>
+                            <input type="number" class="form-control" id="duration" value="60" min="10">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="repeat" class="form-label">Repeat Simulation</label>
+                            <select class="form-select" id="repeat">
+                                <option value="false">No</option>
+                                <option value="true">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" id="start-simulation">
+                                <i class="bi bi-play-fill me-1"></i>Start Simulation
+                            </button>
+                            <button class="btn btn-warning" id="stop-simulation">
+                                <i class="bi bi-stop-fill me-1"></i>Stop Simulation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Price Control -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-sliders"></i>
+                        Manual Price Control
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="price-product" class="form-label">Product</label>
+                            <select class="form-select" id="price-product">
+                                <option value="BTC-USD">BTC-USD</option>
+                                <option value="ETH-USD">ETH-USD</option>
+                                <option value="SOL-USD">SOL-USD</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price-value" class="form-label">Price ($)</label>
+                            <input type="number" class="form-control" id="price-value" value="50000.00" step="0.01">
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-primary" id="set-price">
+                                <i class="bi bi-currency-dollar me-1"></i>Set Price
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Price Chart -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="bi bi-graph-up me-2"></i>Price Chart
+            <!-- Main Content Area -->
+            <div class="col-lg-6">
+                <!-- Price Display -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="bi bi-currency-exchange"></i>
+                            <span id="current-product">BTC-USD</span>
+                        </span>
+                        <span class="text-muted" id="update-time">Last update: Never</span>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="price-display" id="current-price">$0.00</div>
+                        <div class="price-change" id="price-change">0.00% ($0.00)</div>
+
+                        <div class="alert-banner alert-success mt-3" role="alert" id="price-alert" style="display: none;">
+                            <i class="bi bi-bell-fill"></i>
+                            <span id="alert-message"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div id="chart"></div>
+
+                <!-- Current Prices Overview -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-graph-up"></i>
+                        Market Overview
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="current-prices">
+                            <!-- Price cards will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-bar-chart-line"></i>
+                        Price Chart
+                    </div>
+                    <div class="card-body">
+                        <div id="chart"></div>
+                    </div>
+                </div>
+
+                <!-- Trade History -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-clock-history"></i>
+                        Recent Trades
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Side</th>
+                                        <th>Price</th>
+                                        <th>Size</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trade-history">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No trades yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Trade History -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="bi bi-clock-history me-2"></i>Recent Trades
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover trade-history-table">
-                            <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Side</th>
-                                <th>Price</th>
-                                <th>Size</th>
-                                <th>Value</th>
-                            </tr>
-                            </thead>
-                            <tbody id="trade-history">
-                            <tr>
-                                <td colspan="5" class="text-center">No trades yet</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Sidebar - Technical Indicators and Order Book -->
-        <div class="col-md-3 sidebar">
-            <!-- Technical Indicators -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="bi bi-activity me-2"></i>Technical Indicators
-                </div>
-                <div class="card-body">
-                    <div class="indicator">
-                        <span class="indicator-name">RSI (14)</span>
-                        <span class="indicator-value" id="rsi-value">-</span>
-                    </div>
-                    <div class="indicator">
-                        <span class="indicator-name">MACD</span>
-                        <span class="indicator-value" id="macd-value">-</span>
-                    </div>
-                    <div class="indicator">
-                        <span class="indicator-name">SMA (20)</span>
-                        <span class="indicator-value" id="sma20-value">-</span>
-                    </div>
-                    <div class="indicator">
-                        <span class="indicator-name">SMA (50)</span>
-                        <span class="indicator-value" id="sma50-value">-</span>
-                    </div>
-                    <div class="indicator">
-                        <span class="indicator-name">EMA (12)</span>
-                        <span class="indicator-value" id="ema12-value">-</span>
-                    </div>
-                    <div class="indicator">
-                        <span class="indicator-name">EMA (26)</span>
-                        <span class="indicator-value" id="ema26-value">-</span>
-                    </div>
-                    <div class="indicator">
-                        <span class="indicator-name">Bollinger Upper</span>
-                        <span class="indicator-value" id="bollinger-upper-value">-</span>
-                    </div>
-                    <div class="indicator">
-                        <span class="indicator-name">Bollinger Lower</span>
-                        <span class="indicator-value" id="bollinger-lower-value">-</span>
-                    </div>
-                    <div class="indicator">
-                        <span class="indicator-name">BB Width %</span>
-                        <span class="indicator-value" id="bb-width-value">-</span>
-                    </div>
-                    <div class="mt-3">
-                        <button class="btn btn-outline-primary btn-sm w-100" id="refresh-indicators">
-                            <i class="bi bi-arrow-repeat me-1"></i>Refresh Indicators
+            <!-- Right Sidebar - Analytics -->
+            <div class="col-lg-3 sidebar">
+                <!-- Technical Indicators -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="bi bi-activity"></i>
+                            Technical Indicators
+                        </span>
+                        <button class="btn btn-outline-light btn-sm" id="refresh-indicators">
+                            <i class="bi bi-arrow-clockwise"></i>
                         </button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Order Book -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="bi bi-book me-2"></i>Order Book
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm order-book-table">
-                            <thead>
-                            <tr>
-                                <th>Price</th>
-                                <th>Size</th>
-                                <th>Total</th>
-                            </tr>
-                            </thead>
-                            <tbody id="asks-table" class="order-book-asks">
-                            <!-- Asks will be inserted here -->
-                            </tbody>
-                            <tbody>
-                            <tr class="table-secondary">
-                                <td colspan="3" class="text-center py-1" id="spread-value">
-                                    Spread: $0.00 (0.00%)
-                                </td>
-                            </tr>
-                            </tbody>
-                            <tbody id="bids-table" class="order-book-bids">
-                            <!-- Bids will be inserted here -->
-                            </tbody>
-                        </table>
+                    <div class="card-body">
+                        <div class="indicator">
+                            <span class="indicator-name">RSI (14)</span>
+                            <span class="indicator-value" id="rsi-value">-</span>
+                        </div>
+                        <div class="indicator">
+                            <span class="indicator-name">MACD</span>
+                            <span class="indicator-value" id="macd-value">-</span>
+                        </div>
+                        <div class="indicator">
+                            <span class="indicator-name">SMA (20)</span>
+                            <span class="indicator-value" id="sma20-value">-</span>
+                        </div>
+                        <div class="indicator">
+                            <span class="indicator-name">SMA (50)</span>
+                            <span class="indicator-value" id="sma50-value">-</span>
+                        </div>
+                        <div class="indicator">
+                            <span class="indicator-name">EMA (12)</span>
+                            <span class="indicator-value" id="ema12-value">-</span>
+                        </div>
+                        <div class="indicator">
+                            <span class="indicator-name">EMA (26)</span>
+                            <span class="indicator-value" id="ema26-value">-</span>
+                        </div>
+                        <div class="indicator">
+                            <span class="indicator-name">Bollinger Upper</span>
+                            <span class="indicator-value" id="bollinger-upper-value">-</span>
+                        </div>
+                        <div class="indicator">
+                            <span class="indicator-name">Bollinger Lower</span>
+                            <span class="indicator-value" id="bollinger-lower-value">-</span>
+                        </div>
+                        <div class="indicator">
+                            <span class="indicator-name">BB Width %</span>
+                            <span class="indicator-value" id="bb-width-value">-</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- WebSocket Messages -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-chat-square-text me-2"></i>WebSocket Messages</span>
-                    <button class="btn btn-outline-secondary btn-sm" id="clear-messages">Clear</button>
+                <!-- Order Book -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-book"></i>
+                        Order Book
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Price</th>
+                                        <th>Size</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="asks-table" class="order-book-asks">
+                                    <!-- Asks will be inserted here -->
+                                </tbody>
+                                <tbody>
+                                    <tr class="spread-row">
+                                        <td colspan="3" class="text-center py-2" id="spread-value">
+                                            Spread: $0.00 (0.00%)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody id="bids-table" class="order-book-bids">
+                                    <!-- Bids will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="message-log" id="message-log"></div>
+
+                <!-- WebSocket Messages -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="bi bi-chat-square-dots"></i>
+                            WebSocket Messages
+                        </span>
+                        <button class="btn btn-outline-light btn-sm" id="clear-messages">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="message-log" id="message-log"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script>
-    // DOM Elements
-    const connectButton = document.getElementById('connect-button');
-    const disconnectButton = document.getElementById('disconnect-button');
-    const subscribeButton = document.getElementById('subscribe-button');
-    const unsubscribeButton = document.getElementById('unsubscribe-button');
-    const clearMessagesButton = document.getElementById('clear-messages');
-    const startSimulationButton = document.getElementById('start-simulation');
-    const stopSimulationButton = document.getElementById('stop-simulation');
-    const refreshIndicatorsButton = document.getElementById('refresh-indicators');
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <script>
+        // DOM Elements
+        const connectButton = document.getElementById('connect-button');
+        const disconnectButton = document.getElementById('disconnect-button');
+        const subscribeButton = document.getElementById('subscribe-button');
+        const unsubscribeButton = document.getElementById('unsubscribe-button');
+        const clearMessagesButton = document.getElementById('clear-messages');
+        const startSimulationButton = document.getElementById('start-simulation');
+        const stopSimulationButton = document.getElementById('stop-simulation');
+        const refreshIndicatorsButton = document.getElementById('refresh-indicators');
+        const setPriceButton = document.getElementById('set-price');
 
-    const wsUrlInput = document.getElementById('ws-url');
-    const productIdSelect = document.getElementById('product-id');
-    const simulationTypeSelect = document.getElementById('simulation-type');
-    const channelTickerCheckbox = document.getElementById('channel-ticker');
-    const channelLevel2Checkbox = document.getElementById('channel-level2');
-    const channelHeartbeatCheckbox = document.getElementById('channel-heartbeat');
+        const wsUrlInput = document.getElementById('ws-url');
+        const productIdSelect = document.getElementById('product-id');
+        const priceProductSelect = document.getElementById('price-product');
+        const priceValueInput = document.getElementById('price-value');
+        const simulationTypeSelect = document.getElementById('simulation-type');
+        const channelTickerCheckbox = document.getElementById('channel-ticker');
+        const channelLevel2Checkbox = document.getElementById('channel-level2');
+        const channelHeartbeatCheckbox = document.getElementById('channel-heartbeat');
 
-    const connectionStatus = document.getElementById('connection-status');
-    const messageLog = document.getElementById('message-log');
-    const subscriptionsDiv = document.getElementById('subscriptions');
-    const currentPriceDiv = document.getElementById('current-price');
-    const priceChangeDiv = document.getElementById('price-change');
-    const updateTimeDiv = document.getElementById('update-time');
-    const priceAlertDiv = document.getElementById('price-alert');
-    const alertMessageDiv = document.getElementById('alert-message');
-    const asksTableBody = document.getElementById('asks-table');
-    const bidsTableBody = document.getElementById('bids-table');
-    const spreadValueDiv = document.getElementById('spread-value');
-    const tradeHistoryBody = document.getElementById('trade-history');
+        const connectionStatus = document.getElementById('connection-status');
+        const messageLog = document.getElementById('message-log');
+        const subscriptionsDiv = document.getElementById('subscriptions');
+        const currentPriceDiv = document.getElementById('current-price');
+        const priceChangeDiv = document.getElementById('price-change');
+        const updateTimeDiv = document.getElementById('update-time');
+        const priceAlertDiv = document.getElementById('price-alert');
+        const alertMessageDiv = document.getElementById('alert-message');
+        const asksTableBody = document.getElementById('asks-table');
+        const bidsTableBody = document.getElementById('bids-table');
+        const spreadValueDiv = document.getElementById('spread-value');
+        const tradeHistoryBody = document.getElementById('trade-history');
+        const currentPricesDiv = document.getElementById('current-prices');
+        const currentProductSpan = document.getElementById('current-product');
 
-    const rsiValueDiv = document.getElementById('rsi-value');
-    const macdValueDiv = document.getElementById('macd-value');
-    const sma20ValueDiv = document.getElementById('sma20-value');
-    const sma50ValueDiv = document.getElementById('sma50-value');
-    const ema12ValueDiv = document.getElementById('ema12-value');
-    const ema26ValueDiv = document.getElementById('ema26-value');
-    const bollingerUpperValueDiv = document.getElementById('bollinger-upper-value');
-    const bollingerLowerValueDiv = document.getElementById('bollinger-lower-value');
-    const bbWidthValueDiv = document.getElementById('bb-width-value');
+        const rsiValueDiv = document.getElementById('rsi-value');
+        const macdValueDiv = document.getElementById('macd-value');
+        const sma20ValueDiv = document.getElementById('sma20-value');
+        const sma50ValueDiv = document.getElementById('sma50-value');
+        const ema12ValueDiv = document.getElementById('ema12-value');
+        const ema26ValueDiv = document.getElementById('ema26-value');
+        const bollingerUpperValueDiv = document.getElementById('bollinger-upper-value');
+        const bollingerLowerValueDiv = document.getElementById('bollinger-lower-value');
+        const bbWidthValueDiv = document.getElementById('bb-width-value');
 
-    const trendOptions = document.getElementById('trend-options');
-    const volatilityOptions = document.getElementById('volatility-options');
+        const trendOptions = document.getElementById('trend-options');
+        const volatilityOptions = document.getElementById('volatility-options');
 
-    // State
-    let socket = null;
-    let activeSubscriptions = new Set();
-    let priceHistory = [];
-    let lastPrice = 0;
-    let chart = null;
-    let orderBook = {
-        asks: [],
-        bids: []
-    };
-    let tradeHistory = [];
+        // State
+        let socket = null;
+        let activeSubscriptions = new Set();
+        let priceHistory = [];
+        let lastPrice = 0;
+        let chart = null;
+        let orderBook = { asks: [], bids: [] };
+        let tradeHistory = [];
+        let currentPrices = {};
 
-    // Event Listeners
-    connectButton.addEventListener('click', connect);
-    disconnectButton.addEventListener('click', disconnect);
-    subscribeButton.addEventListener('click', subscribe);
-    unsubscribeButton.addEventListener('click', unsubscribe);
-    clearMessagesButton.addEventListener('click', clearMessages);
-    startSimulationButton.addEventListener('click', startSimulation);
-    stopSimulationButton.addEventListener('click', stopSimulation);
-    refreshIndicatorsButton.addEventListener('click', refreshIndicators);
+        // Event Listeners
+        connectButton.addEventListener('click', connect);
+        disconnectButton.addEventListener('click', disconnect);
+        subscribeButton.addEventListener('click', subscribe);
+        unsubscribeButton.addEventListener('click', unsubscribe);
+        clearMessagesButton.addEventListener('click', clearMessages);
+        startSimulationButton.addEventListener('click', startSimulation);
+        stopSimulationButton.addEventListener('click', stopSimulation);
+        refreshIndicatorsButton.addEventListener('click', refreshIndicators);
+        setPriceButton.addEventListener('click', setPrice);
 
-    simulationTypeSelect.addEventListener('change', function() {
-        if (this.value === 'trend') {
-            trendOptions.style.display = 'block';
-            volatilityOptions.style.display = 'none';
-        } else {
-            trendOptions.style.display = 'none';
-            volatilityOptions.style.display = 'block';
+        simulationTypeSelect.addEventListener('change', function() {
+            if (this.value === 'trend') {
+                trendOptions.style.display = 'block';
+                volatilityOptions.style.display = 'none';
+            } else {
+                trendOptions.style.display = 'none';
+                volatilityOptions.style.display = 'block';
+            }
+        });
+
+        productIdSelect.addEventListener('change', function() {
+            currentProductSpan.textContent = this.value;
+            priceHistory = [];
+            lastPrice = 0;
+            initializeChart();
+            orderBook = { asks: [], bids: [] };
+            updateOrderBook();
+            tradeHistory = [];
+            updateTradeHistory();
+            clearIndicators();
+            refreshIndicators();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChart();
+            updateCurrentPrices();
+        });
+
+        // Functions
+        function connect() {
+            const url = wsUrlInput.value;
+            try {
+                socket = new WebSocket(url);
+
+                socket.onopen = function() {
+                    logMessage('WebSocket connection established', 'status');
+                    connectionStatus.innerHTML = '<i class="bi bi-circle-fill"></i> Connected';
+                    connectionStatus.className = 'connection-status connected';
+
+                    connectButton.disabled = true;
+                    disconnectButton.disabled = false;
+                    subscribeButton.disabled = false;
+                    unsubscribeButton.disabled = false;
+                };
+
+                socket.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        logMessage(`Received: ${JSON.stringify(data, null, 2)}`, 'received');
+                        handleMessage(data);
+                    } catch (error) {
+                        logMessage(`Error parsing message: ${error.message}`, 'error');
+                    }
+                };
+
+                socket.onclose = function() {
+                    logMessage('WebSocket connection closed', 'status');
+                    connectionStatus.innerHTML = '<i class="bi bi-circle-fill"></i> Disconnected';
+                    connectionStatus.className = 'connection-status disconnected';
+
+                    connectButton.disabled = false;
+                    disconnectButton.disabled = true;
+                    subscribeButton.disabled = true;
+                    unsubscribeButton.disabled = true;
+                };
+
+            } catch (error) {
+                logMessage(`Connection error: ${error.message}`, 'error');
+            }
         }
-    });
 
-    productIdSelect.addEventListener('change', function() {
-        // Update header with product ID
-        document.querySelector('.card-header span:first-child').textContent = this.value;
-
-        // Clear price history and chart
-        priceHistory = [];
-        lastPrice = 0;
-        initializeChart();
-
-        // Clear order book
-        orderBook = { asks: [], bids: [] };
-        updateOrderBook();
-
-        // Clear trade history
-        tradeHistory = [];
-        updateTradeHistory();
-
-        // Clear technical indicators
-        clearIndicators();
-
-        // Refresh technical indicators for the new product
-        refreshIndicators();
-    });
-
-    // Functions
-    function connect() {
-        const url = wsUrlInput.value;
-        try {
-            socket = new WebSocket(url);
-
-            socket.onopen = function() {
-                logMessage('WebSocket connection established', 'status');
-                connectionStatus.textContent = 'Connected';
-                connectionStatus.className = 'connection-status connected';
-
-                connectButton.disabled = true;
-                disconnectButton.disabled = false;
-                subscribeButton.disabled = false;
-                unsubscribeButton.disabled = false;
-            };
-
-            socket.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                logMessage(JSON.stringify(data, null, 2), 'received');
-
-                handleIncomingMessage(data);
-            };
-
-            socket.onclose = function(event) {
-                logMessage(`WebSocket connection closed: ${event.reason || 'Unknown reason'}`, 'status');
-                connectionStatus.textContent = 'Disconnected';
-                connectionStatus.className = 'connection-status disconnected';
-
-                connectButton.disabled = false;
-                disconnectButton.disabled = true;
-                subscribeButton.disabled = true;
-                unsubscribeButton.disabled = true;
-
+        function disconnect() {
+            if (socket) {
+                socket.close();
                 socket = null;
                 activeSubscriptions.clear();
-                updateSubscriptionsDisplay();
+                updateSubscriptionsList();
+            }
+        }
+
+        function subscribe() {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                logMessage('WebSocket not connected', 'error');
+                return;
+            }
+
+            const productId = productIdSelect.value;
+            const channels = [];
+
+            if (channelTickerCheckbox.checked) channels.push('ticker');
+            if (channelLevel2Checkbox.checked) channels.push('level2');
+            if (channelHeartbeatCheckbox.checked) channels.push('heartbeat');
+
+            if (channels.length === 0) {
+                logMessage('No channels selected', 'error');
+                return;
+            }
+
+            const message = {
+                type: 'subscribe',
+                product_ids: [productId],
+                channels: channels
             };
 
-            socket.onerror = function(error) {
-                logMessage(`WebSocket error: ${error.message || 'Unknown error'}`, 'error');
+            socket.send(JSON.stringify(message));
+            logMessage(`Sent: ${JSON.stringify(message, null, 2)}`, 'sent');
+
+            channels.forEach(channel => {
+                activeSubscriptions.add(`${productId}:${channel}`);
+            });
+
+            updateSubscriptionsList();
+        }
+
+        function unsubscribe() {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                logMessage('WebSocket not connected', 'error');
+                return;
+            }
+
+            const productId = productIdSelect.value;
+            const channels = [];
+
+            if (channelTickerCheckbox.checked) channels.push('ticker');
+            if (channelLevel2Checkbox.checked) channels.push('level2');
+            if (channelHeartbeatCheckbox.checked) channels.push('heartbeat');
+
+            if (channels.length === 0) {
+                logMessage('No channels selected', 'error');
+                return;
+            }
+
+            const message = {
+                type: 'unsubscribe',
+                product_ids: [productId],
+                channels: channels
             };
 
-        } catch (error) {
-            logMessage(`Failed to connect: ${error.message}`, 'error');
-        }
-    }
+            socket.send(JSON.stringify(message));
+            logMessage(`Sent: ${JSON.stringify(message, null, 2)}`, 'sent');
 
-    function disconnect() {
-        if (socket) {
-            socket.close();
-        }
-    }
+            channels.forEach(channel => {
+                activeSubscriptions.delete(`${productId}:${channel}`);
+            });
 
-    function subscribe() {
-        if (!socket || socket.readyState !== WebSocket.OPEN) {
-            logMessage('Cannot subscribe: WebSocket is not connected', 'error');
-            return;
+            updateSubscriptionsList();
         }
 
-        const productId = productIdSelect.value;
-        const channels = [];
+        function setPrice() {
+            const product = priceProductSelect.value;
+            const price = parseFloat(priceValueInput.value);
 
-        if (channelTickerCheckbox.checked) channels.push('ticker');
-        if (channelLevel2Checkbox.checked) channels.push('level2');
-        if (channelHeartbeatCheckbox.checked) channels.push('heartbeat');
+            if (isNaN(price) || price <= 0) {
+                logMessage('Invalid price value', 'error');
+                return;
+            }
 
-        if (channels.length === 0) {
-            logMessage('Please select at least one channel', 'error');
-            return;
-        }
-
-        const message = {
-            type: 'subscribe',
-            product_ids: [productId],
-            channels: channels
-        };
-
-        socket.send(JSON.stringify(message));
-        logMessage(JSON.stringify(message, null, 2), 'sent');
-
-        // Add subscriptions
-        for (const channel of channels) {
-            activeSubscriptions.add(`${channel}:${productId}`);
-        }
-
-        updateSubscriptionsDisplay();
-    }
-
-    function unsubscribe() {
-        if (!socket || socket.readyState !== WebSocket.OPEN) {
-            logMessage('Cannot unsubscribe: WebSocket is not connected', 'error');
-            return;
-        }
-
-        const productId = productIdSelect.value;
-        const channels = [];
-
-        if (channelTickerCheckbox.checked) channels.push('ticker');
-        if (channelLevel2Checkbox.checked) channels.push('level2');
-        if (channelHeartbeatCheckbox.checked) channels.push('heartbeat');
-
-        if (channels.length === 0) {
-            logMessage('Please select at least one channel', 'error');
-            return;
-        }
-
-        const message = {
-            type: 'unsubscribe',
-            product_ids: [productId],
-            channels: channels
-        };
-
-        socket.send(JSON.stringify(message));
-        logMessage(JSON.stringify(message, null, 2), 'sent');
-
-        // Remove subscriptions
-        for (const channel of channels) {
-            activeSubscriptions.delete(`${channel}:${productId}`);
-        }
-
-        updateSubscriptionsDisplay();
-    }
-
-    function startSimulation() {
-        const productId = productIdSelect.value;
-        const simulationType = simulationTypeSelect.value;
-        const duration = parseInt(document.getElementById('duration').value);
-        const repeat = document.getElementById('repeat').value === 'true';
-
-        let requestBody = {
-            mode: simulationType,
-            durationSeconds: duration,
-            repeat: repeat
-        };
-
-        if (simulationType === 'trend') {
-            requestBody.startPrice = parseFloat(document.getElementById('start-price').value);
-            requestBody.endPrice = parseFloat(document.getElementById('end-price').value);
-        } else { // volatility
-            requestBody.basePrice = parseFloat(document.getElementById('base-price').value);
-            requestBody.volatilityPercent = parseFloat(document.getElementById('volatility-percent').value);
-        }
-
-        fetch(`http://localhost:5226/api/v3/sandbox/prices/${productId}/simulate`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
+            fetch(`/api/v3/sandbox/prices/${product}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(price)
             })
+            .then(response => response.json())
             .then(data => {
-                logMessage(`Successfully started ${simulationType} simulation for ${productId}`, 'status');
-                showAlert(`Started ${simulationType} simulation for ${duration} seconds`);
+                logMessage(`Price set for ${product}: $${price}`, 'status');
+                currentPrices[product] = price;
+                updateCurrentPrices();
+            })
+            .catch(error => {
+                logMessage(`Error setting price: ${error.message}`, 'error');
+            });
+        }
+
+        function startSimulation() {
+            const simulationType = simulationTypeSelect.value;
+            const duration = parseInt(document.getElementById('duration').value);
+            const repeat = document.getElementById('repeat').value === 'true';
+
+            let requestBody = {
+                mode: simulationType,
+                durationSeconds: duration,
+                repeat: repeat
+            };
+
+            if (simulationType === 'trend') {
+                requestBody.startPrice = parseFloat(document.getElementById('start-price').value);
+                requestBody.endPrice = parseFloat(document.getElementById('end-price').value);
+            } else {
+                requestBody.basePrice = parseFloat(document.getElementById('base-price').value);
+                requestBody.volatilityPercent = parseFloat(document.getElementById('volatility-percent').value);
+            }
+
+            fetch(`/api/v3/sandbox/prices/${productIdSelect.value}/simulate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => response.json())
+            .then(data => {
+                logMessage(`${simulationType} simulation started`, 'status');
             })
             .catch(error => {
                 logMessage(`Error starting simulation: ${error.message}`, 'error');
             });
-    }
+        }
 
-    function stopSimulation() {
-        const productId = productIdSelect.value;
-
-        fetch(`http://localhost:5226/api/v3/sandbox/prices/${productId}/simulation`, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
+        function stopSimulation() {
+            fetch(`/api/v3/sandbox/prices/${productIdSelect.value}/simulation`, {
+                method: 'DELETE'
             })
+            .then(response => response.json())
             .then(data => {
-                logMessage(`Successfully stopped simulation for ${productId}`, 'status');
-                showAlert(`Stopped simulation for ${productId}`);
+                logMessage('Simulation stopped', 'status');
             })
             .catch(error => {
                 logMessage(`Error stopping simulation: ${error.message}`, 'error');
             });
-    }
+        }
 
-    function refreshIndicators() {
-        const productId = productIdSelect.value;
-
-        fetch(`http://localhost:5226/api/technical-analysis/${productId}/indicators`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                updateIndicators(data);
-            })
-            .catch(error => {
-                logMessage(`Error getting technical indicators: ${error.message}`, 'error');
+        function refreshIndicators() {
+            const productId = productIdSelect.value;
+            
+            // Show loading state
+            const indicators = [rsiValueDiv, macdValueDiv, sma20ValueDiv, sma50ValueDiv, 
+                              ema12ValueDiv, ema26ValueDiv, bollingerUpperValueDiv, 
+                              bollingerLowerValueDiv, bbWidthValueDiv];
+            
+            indicators.forEach(indicator => {
+                indicator.innerHTML = '<div class="loading"></div>';
             });
-    }
 
-    function updateIndicators(data) {
-        // Format and display indicators
-        if (data.RSI14 !== undefined) {
-            rsiValueDiv.textContent = data.RSI14.toFixed(2);
-            if (data.RSI14 > 70) {
-                rsiValueDiv.className = 'indicator-value negative';
-            } else if (data.RSI14 < 30) {
-                rsiValueDiv.className = 'indicator-value positive';
+            fetch(`/api/technical-analysis/${productId}/indicators`)
+                .then(response => response.json())
+                .then(data => {
+                    updateIndicators(data);
+                })
+                .catch(error => {
+                    logMessage(`Error fetching indicators: ${error.message}`, 'error');
+                    clearIndicators();
+                });
+        }
+
+        function clearMessages() {
+            messageLog.innerHTML = '';
+        }
+
+        function logMessage(message, type = 'info') {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            messageElement.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            messageLog.appendChild(messageElement);
+            messageLog.scrollTop = messageLog.scrollHeight;
+        }
+
+        function updateSubscriptionsList() {
+            if (activeSubscriptions.size === 0) {
+                subscriptionsDiv.innerHTML = '<p class="text-muted mb-0">No active subscriptions</p>';
             } else {
-                rsiValueDiv.className = 'indicator-value';
+                const subscriptionItems = Array.from(activeSubscriptions).map(sub => 
+                    `<div class="subscription-item">${sub}</div>`
+                ).join('');
+                subscriptionsDiv.innerHTML = subscriptionItems;
             }
         }
 
-        if (data.MACD !== undefined) {
-            macdValueDiv.textContent = data.MACD.toFixed(2);
-            if (data.MACD > 0) {
-                macdValueDiv.className = 'indicator-value positive';
-            } else {
-                macdValueDiv.className = 'indicator-value negative';
+        function updateCurrentPrices() {
+            const products = ['BTC-USD', 'ETH-USD', 'SOL-USD'];
+            let html = '';
+
+            products.forEach(product => {
+                const price = currentPrices[product] || 0;
+                html += `
+                    <div class="col-md-4 mb-3">
+                        <div class="price-card">
+                            <div class="symbol">${product}</div>
+                            <div class="price">$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            currentPricesDiv.innerHTML = html;
+        }
+
+        function handleMessage(data) {
+            if (data.channel === 'ticker') {
+                handleTickerMessage(data);
+            } else if (data.channel === 'level2') {
+                handleLevel2Message(data);
+            } else if (data.channel === 'heartbeat') {
+                handleHeartbeatMessage(data);
             }
         }
 
-        if (data.SMA20 !== undefined) {
-            sma20ValueDiv.textContent = data.SMA20.toFixed(2);
-            if (data.Price > data.SMA20) {
-                sma20ValueDiv.className = 'indicator-value positive';
-            } else {
-                sma20ValueDiv.className = 'indicator-value negative';
-            }
-        }
-
-        if (data.SMA50 !== undefined) {
-            sma50ValueDiv.textContent = data.SMA50.toFixed(2);
-            if (data.Price > data.SMA50) {
-                sma50ValueDiv.className = 'indicator-value positive';
-            } else {
-                sma50ValueDiv.className = 'indicator-value negative';
-            }
-        }
-
-        if (data.EMA12 !== undefined) {
-            ema12ValueDiv.textContent = data.EMA12.toFixed(2);
-            if (data.Price > data.EMA12) {
-                ema12ValueDiv.className = 'indicator-value positive';
-            } else {
-                ema12ValueDiv.className = 'indicator-value negative';
-            }
-        }
-
-        if (data.EMA26 !== undefined) {
-            ema26ValueDiv.textContent = data.EMA26.toFixed(2);
-            if (data.Price > data.EMA26) {
-                ema26ValueDiv.className = 'indicator-value positive';
-            } else {
-                ema26ValueDiv.className = 'indicator-value negative';
-            }
-        }
-
-        if (data.BollingerUpper !== undefined) {
-            bollingerUpperValueDiv.textContent = data.BollingerUpper.toFixed(2);
-        }
-
-        if (data.BollingerLower !== undefined) {
-            bollingerLowerValueDiv.textContent = data.BollingerLower.toFixed(2);
-        }
-
-        if (data.BollingerBandWidth !== undefined) {
-            bbWidthValueDiv.textContent = data['BollingerBandWidth%'].toFixed(2) + '%';
-        }
-    }
-
-    function clearIndicators() {
-        rsiValueDiv.textContent = '-';
-        rsiValueDiv.className = 'indicator-value';
-
-        macdValueDiv.textContent = '-';
-        macdValueDiv.className = 'indicator-value';
-
-        sma20ValueDiv.textContent = '-';
-        sma20ValueDiv.className = 'indicator-value';
-
-        sma50ValueDiv.textContent = '-';
-        sma50ValueDiv.className = 'indicator-value';
-
-        ema12ValueDiv.textContent = '-';
-        ema12ValueDiv.className = 'indicator-value';
-
-        ema26ValueDiv.textContent = '-';
-        ema26ValueDiv.className = 'indicator-value';
-
-        bollingerUpperValueDiv.textContent = '-';
-        bollingerLowerValueDiv.textContent = '-';
-        bbWidthValueDiv.textContent = '-';
-    }
-
-    function showAlert(message) {
-        alertMessageDiv.textContent = message;
-        priceAlertDiv.style.display = 'block';
-
-        // Hide after 5 seconds
-        setTimeout(() => {
-            priceAlertDiv.style.display = 'none';
-        }, 5000);
-    }
-
-    function logMessage(message, type) {
-        const msgElement = document.createElement('div');
-        msgElement.className = `message ${type}`;
-        msgElement.textContent = message;
-
-        messageLog.appendChild(msgElement);
-        messageLog.scrollTop = messageLog.scrollHeight;
-    }
-
-    function clearMessages() {
-        messageLog.innerHTML = '';
-    }
-
-    function updateSubscriptionsDisplay() {
-        subscriptionsDiv.innerHTML = '';
-
-        if (activeSubscriptions.size === 0) {
-            subscriptionsDiv.innerHTML = '<p class="text-muted">No active subscriptions</p>';
-            return;
-        }
-
-        const list = document.createElement('ul');
-        list.className = 'list-group list-group-flush';
-
-        for (const subscription of activeSubscriptions) {
-            const [channel, productId] = subscription.split(':');
-
-            const item = document.createElement('li');
-            item.className = 'list-group-item py-1 px-2';
-            item.textContent = `${channel} - ${productId}`;
-            list.appendChild(item);
-        }
-
-        subscriptionsDiv.appendChild(list);
-    }
-
-    function handleIncomingMessage(data) {
-        if (data.type === 'ticker') {
-            const productId = data.product_id;
+        function handleTickerMessage(data) {
             const price = parseFloat(data.price);
-            const time = data.time;
+            const productId = data.product_id;
+            
+            currentPrices[productId] = price;
+            updateCurrentPrices();
 
-            updatePrice(productId, price, time);
-            addPriceToChart(price, time);
+            if (productId === productIdSelect.value) {
+                const change = price - lastPrice;
+                const changePercent = lastPrice > 0 ? (change / lastPrice) * 100 : 0;
 
-            // Add to trade history (simulated)
-            addTrade(time, Math.random() > 0.5 ? 'buy' : 'sell', price, (Math.random() * 0.5 + 0.1).toFixed(6));
-        } else if (data.type === 'l2update') {
-            // Update order book
-            updateOrderBookData(data);
-        }
-    }
+                currentPriceDiv.textContent = `$${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                
+                const changeText = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}% ($${change >= 0 ? '+' : ''}${change.toFixed(2)})`;
+                priceChangeDiv.textContent = changeText;
+                priceChangeDiv.className = `price-change ${changePercent >= 0 ? 'positive' : 'negative'}`;
 
-    function updatePrice(productId, price, time) {
-        // Format price
-        const formattedPrice = formatPrice(price);
-        currentPriceDiv.textContent = formattedPrice;
+                updateTimeDiv.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
 
-        // Calculate and display change
-        if (lastPrice > 0) {
-            const change = price - lastPrice;
-            const percentChange = (change / lastPrice) * 100;
+                // Update chart
+                priceHistory.push({
+                    time: new Date(),
+                    price: price
+                });
 
-            priceChangeDiv.textContent = `${percentChange.toFixed(2)}% (${change.toFixed(2)})`;
+                if (priceHistory.length > 100) {
+                    priceHistory.shift();
+                }
 
-            if (change >= 0) {
-                priceChangeDiv.className = 'price-change positive';
-            } else {
-                priceChangeDiv.className = 'price-change negative';
+                updateChart();
+                lastPrice = price;
+
+                // Add to trade history
+                addTradeToHistory({
+                    time: new Date(),
+                    side: change >= 0 ? 'BUY' : 'SELL',
+                    price: price,
+                    size: Math.random() * 0.1 + 0.01,
+                    value: price * (Math.random() * 0.1 + 0.01)
+                });
             }
         }
 
-        // Update last price
-        lastPrice = price;
+        function handleLevel2Message(data) {
+            if (data.type === 'snapshot') {
+                orderBook.asks = data.asks || [];
+                orderBook.bids = data.bids || [];
+            } else if (data.type === 'l2update') {
+                // Handle order book updates
+                if (data.changes) {
+                    data.changes.forEach(change => {
+                        const [side, price, size] = change;
+                        const priceLevel = parseFloat(price);
+                        const sizeLevel = parseFloat(size);
 
-        // Update time
-        const formattedTime = new Date(time).toLocaleTimeString();
-        updateTimeDiv.textContent = `Last update: ${formattedTime}`;
-    }
-
-    function formatPrice(price) {
-        // Format price based on value
-        if (price >= 1000) {
-            return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        } else if (price >= 1) {
-            return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`;
-        } else {
-            return `$${price.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 8 })}`;
+                        if (side === 'sell') {
+                            if (sizeLevel === 0) {
+                                orderBook.asks = orderBook.asks.filter(ask => parseFloat(ask[0]) !== priceLevel);
+                            } else {
+                                const existingIndex = orderBook.asks.findIndex(ask => parseFloat(ask[0]) === priceLevel);
+                                if (existingIndex >= 0) {
+                                    orderBook.asks[existingIndex] = [price, size];
+                                } else {
+                                    orderBook.asks.push([price, size]);
+                                }
+                            }
+                        } else if (side === 'buy') {
+                            if (sizeLevel === 0) {
+                                orderBook.bids = orderBook.bids.filter(bid => parseFloat(bid[0]) !== priceLevel);
+                            } else {
+                                const existingIndex = orderBook.bids.findIndex(bid => parseFloat(bid[0]) === priceLevel);
+                                if (existingIndex >= 0) {
+                                    orderBook.bids[existingIndex] = [price, size];
+                                } else {
+                                    orderBook.bids.push([price, size]);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            updateOrderBook();
         }
-    }
 
-    function initializeChart() {
-        const ctx = document.getElementById('chart').getContext('2d');
-
-        if (chart) {
-            chart.destroy();
+        function handleHeartbeatMessage(data) {
+            // Just log heartbeat messages
         }
 
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [{
-                    label: 'Price',
-                    data: [],
-                    borderColor: '#0052cc',
-                    backgroundColor: 'rgba(0, 82, 204, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.2,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
+        function updateOrderBook() {
+            // Sort and limit order book data
+            orderBook.asks.sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
+            orderBook.bids.sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]));
+
+            const maxLevels = 10;
+            const topAsks = orderBook.asks.slice(0, maxLevels);
+            const topBids = orderBook.bids.slice(0, maxLevels);
+
+            // Update asks table
+            let asksHtml = '';
+            let askTotal = 0;
+            topAsks.reverse().forEach(ask => {
+                const price = parseFloat(ask[0]);
+                const size = parseFloat(ask[1]);
+                askTotal += size;
+                asksHtml += `
+                    <tr>
+                        <td>$${price.toFixed(2)}</td>
+                        <td>${size.toFixed(4)}</td>
+                        <td>${askTotal.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+            asksTableBody.innerHTML = asksHtml;
+
+            // Update bids table
+            let bidsHtml = '';
+            let bidTotal = 0;
+            topBids.forEach(bid => {
+                const price = parseFloat(bid[0]);
+                const size = parseFloat(bid[1]);
+                bidTotal += size;
+                bidsHtml += `
+                    <tr>
+                        <td>$${price.toFixed(2)}</td>
+                        <td>${size.toFixed(4)}</td>
+                        <td>${bidTotal.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+            bidsTableBody.innerHTML = bidsHtml;
+
+            // Update spread
+            if (topAsks.length > 0 && topBids.length > 0) {
+                const bestAsk = parseFloat(topAsks[topAsks.length - 1][0]);
+                const bestBid = parseFloat(topBids[0][0]);
+                const spread = bestAsk - bestBid;
+                const spreadPercent = (spread / bestBid) * 100;
+                spreadValueDiv.textContent = `Spread: $${spread.toFixed(2)} (${spreadPercent.toFixed(3)}%)`;
+            }
+        }
+
+        function addTradeToHistory(trade) {
+            tradeHistory.unshift(trade);
+            if (tradeHistory.length > 50) {
+                tradeHistory.pop();
+            }
+            updateTradeHistory();
+        }
+
+        function updateTradeHistory() {
+            if (tradeHistory.length === 0) {
+                tradeHistoryBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No trades yet</td></tr>';
+                return;
+            }
+
+            const html = tradeHistory.map(trade => `
+                <tr>
+                    <td>${trade.time.toLocaleTimeString()}</td>
+                    <td><span class="trade-${trade.side.toLowerCase()}">${trade.side}</span></td>
+                    <td>$${trade.price.toFixed(2)}</td>
+                    <td>${trade.size.toFixed(4)}</td>
+                    <td>$${trade.value.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            tradeHistoryBody.innerHTML = html;
+        }
+
+                 function updateIndicators(data) {
+             rsiValueDiv.textContent = data.RSI14 ? data.RSI14.toFixed(2) : '-';
+             rsiValueDiv.className = 'indicator-value ' + (data.RSI14 > 70 ? 'negative' : data.RSI14 < 30 ? 'positive' : '');
+
+             macdValueDiv.textContent = data.MACD ? data.MACD.toFixed(4) : '-';
+             macdValueDiv.className = 'indicator-value ' + (data.MACD > 0 ? 'positive' : 'negative');
+
+             sma20ValueDiv.textContent = data.SMA20 ? `$${data.SMA20.toFixed(2)}` : '-';
+             sma50ValueDiv.textContent = data.SMA50 ? `$${data.SMA50.toFixed(2)}` : '-';
+             ema12ValueDiv.textContent = data.EMA12 ? `$${data.EMA12.toFixed(2)}` : '-';
+             ema26ValueDiv.textContent = data.EMA26 ? `$${data.EMA26.toFixed(2)}` : '-';
+             bollingerUpperValueDiv.textContent = data.BollingerUpper ? `$${data.BollingerUpper.toFixed(2)}` : '-';
+             bollingerLowerValueDiv.textContent = data.BollingerLower ? `$${data.BollingerLower.toFixed(2)}` : '-';
+             bbWidthValueDiv.textContent = data['BollingerBandWidth%'] ? `${data['BollingerBandWidth%'].toFixed(2)}%` : '-';
+         }
+
+        function clearIndicators() {
+            [rsiValueDiv, macdValueDiv, sma20ValueDiv, sma50ValueDiv, 
+             ema12ValueDiv, ema26ValueDiv, bollingerUpperValueDiv, 
+             bollingerLowerValueDiv, bbWidthValueDiv].forEach(div => {
+                div.textContent = '-';
+                div.className = 'indicator-value';
+            });
+        }
+
+        function initializeChart() {
+            const ctx = document.getElementById('chart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Price',
+                        data: [],
+                        borderColor: '#1f6feb',
+                        backgroundColor: 'rgba(31, 111, 235, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
                 },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'minute',
-                            displayFormats: {
-                                minute: 'HH:mm:ss'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#f0f6fc'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#8b949e'
+                            },
+                            grid: {
+                                color: '#30363d'
                             }
                         },
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Price'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
+                        y: {
+                            ticks: {
+                                color: '#8b949e',
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
                                 }
-                                if (context.parsed.y !== null) {
-                                    label += formatPrice(context.parsed.y);
-                                }
-                                return label;
+                            },
+                            grid: {
+                                color: '#30363d'
                             }
                         }
                     }
                 }
-            }
-        });
-    }
-
-    function addPriceToChart(price, time) {
-        if (!chart) {
-            initializeChart();
+            });
         }
 
-        // Add to price history array
-        priceHistory.push({ x: new Date(time), y: price });
+        function updateChart() {
+            if (!chart || priceHistory.length === 0) return;
 
-        // Keep only the last 100 data points
-        if (priceHistory.length > 100) {
-            priceHistory.shift();
+            const labels = priceHistory.map(point => point.time.toLocaleTimeString());
+            const data = priceHistory.map(point => point.price);
+
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = data;
+            chart.update('none');
         }
-
-        // Update chart data
-        chart.data.datasets[0].data = priceHistory;
-        chart.update();
-    }
-
-    function updateOrderBookData(data) {
-        const productId = data.product_id;
-
-        if (data.changes) {
-            if (data.changes.asks) {
-                for (const ask of data.changes.asks) {
-                    updateOrderBookLevel('asks', parseFloat(ask[0]), parseFloat(ask[1]));
-                }
-            }
-
-            if (data.changes.bids) {
-                for (const bid of data.changes.bids) {
-                    updateOrderBookLevel('bids', parseFloat(bid[0]), parseFloat(bid[1]));
-                }
-            }
-        }
-
-        updateOrderBook();
-    }
-
-    function updateOrderBookLevel(side, price, size) {
-        // Find the level in the order book
-        const levels = orderBook[side];
-        const levelIndex = levels.findIndex(level => level.price === price);
-
-        if (size === 0) {
-            // Remove the level if size is 0
-            if (levelIndex !== -1) {
-                levels.splice(levelIndex, 1);
-            }
-        } else {
-            // Update or add the level
-            if (levelIndex !== -1) {
-                levels[levelIndex].size = size;
-            } else {
-                levels.push({ price, size });
-            }
-        }
-
-        // Sort the levels (asks ascending, bids descending)
-        if (side === 'asks') {
-            levels.sort((a, b) => a.price - b.price);
-        } else {
-            levels.sort((a, b) => b.price - a.price);
-        }
-    }
-
-    function updateOrderBook() {
-        // Clear the tables
-        asksTableBody.innerHTML = '';
-        bidsTableBody.innerHTML = '';
-
-        // Show top 5 asks (lowest to highest)
-        orderBook.asks.slice(0, 5).forEach((ask, index) => {
-            const row = document.createElement('tr');
-
-            const priceCell = document.createElement('td');
-            priceCell.textContent = ask.price.toFixed(2);
-
-            const sizeCell = document.createElement('td');
-            sizeCell.textContent = ask.size.toFixed(6);
-
-            const totalCell = document.createElement('td');
-            totalCell.textContent = (ask.price * ask.size).toFixed(2);
-
-            row.appendChild(priceCell);
-            row.appendChild(sizeCell);
-            row.appendChild(totalCell);
-
-            asksTableBody.appendChild(row);
-        });
-
-        // Show top 5 bids (highest to lowest)
-        orderBook.bids.slice(0, 5).forEach((bid, index) => {
-            const row = document.createElement('tr');
-
-            const priceCell = document.createElement('td');
-            priceCell.textContent = bid.price.toFixed(2);
-
-            const sizeCell = document.createElement('td');
-            sizeCell.textContent = bid.size.toFixed(6);
-
-            const totalCell = document.createElement('td');
-            totalCell.textContent = (bid.price * bid.size).toFixed(2);
-
-            row.appendChild(priceCell);
-            row.appendChild(sizeCell);
-            row.appendChild(totalCell);
-
-            bidsTableBody.appendChild(row);
-        });
-
-        // Calculate and display spread
-        if (orderBook.asks.length > 0 && orderBook.bids.length > 0) {
-            const lowestAsk = orderBook.asks[0].price;
-            const highestBid = orderBook.bids[0].price;
-            const spread = lowestAsk - highestBid;
-            const spreadPercent = (spread / lowestAsk) * 100;
-
-            spreadValueDiv.textContent = `Spread: $${spread.toFixed(2)} (${spreadPercent.toFixed(2)}%)`;
-        } else {
-            spreadValueDiv.textContent = 'Spread: $0.00 (0.00%)';
-        }
-    }
-
-    function addTrade(time, side, price, size) {
-        // Create a new trade object
-        const trade = {
-            time: new Date(time),
-            side: side,
-            price: price,
-            size: parseFloat(size),
-            value: price * parseFloat(size)
-        };
-
-        // Add to trade history
-        tradeHistory.unshift(trade);
-
-        // Keep only the last 20 trades
-        if (tradeHistory.length > 20) {
-            tradeHistory.pop();
-        }
-
-        updateTradeHistory();
-    }
-
-    function updateTradeHistory() {
-        // Clear the table
-        tradeHistoryBody.innerHTML = '';
-
-        if (tradeHistory.length === 0) {
-            const row = document.createElement('tr');
-            const cell = document.createElement('td');
-            cell.colSpan = 5;
-            cell.className = 'text-center';
-            cell.textContent = 'No trades yet';
-            row.appendChild(cell);
-            tradeHistoryBody.appendChild(row);
-            return;
-        }
-
-        // Add trades to the table
-        tradeHistory.forEach(trade => {
-            const row = document.createElement('tr');
-
-            const timeCell = document.createElement('td');
-            timeCell.textContent = trade.time.toLocaleTimeString();
-
-            const sideCell = document.createElement('td');
-            sideCell.textContent = trade.side.toUpperCase();
-            sideCell.className = trade.side === 'buy' ? 'trade-buy' : 'trade-sell';
-
-            const priceCell = document.createElement('td');
-            priceCell.textContent = trade.price.toFixed(2);
-
-            const sizeCell = document.createElement('td');
-            sizeCell.textContent = trade.size.toFixed(6);
-
-            const valueCell = document.createElement('td');
-            valueCell.textContent = trade.value.toFixed(2);
-
-            row.appendChild(timeCell);
-            row.appendChild(sideCell);
-            row.appendChild(priceCell);
-            row.appendChild(sizeCell);
-            row.appendChild(valueCell);
-
-            tradeHistoryBody.appendChild(row);
-        });
-    }
-
-    // Initialize the chart when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeChart();
-    });
-</script>
+    </script>
 </body>
 </html>
