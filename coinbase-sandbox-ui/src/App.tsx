@@ -1,112 +1,54 @@
-import React, { useState } from "react";
-import {
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
-  Typography,
-  Box,
-  AppBar,
-  Toolbar,
-  IconButton,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import { Sidebar } from "./components/common/Sidebar";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Box, CssBaseline } from "@mui/material";
+import { useState } from "react";
+import "./App.css";
+import { AppSidebar } from "./components/AppSidebar";
+import { Dashboard } from "./components/Dashboard";
+import { AppHeader } from "./components/AppHeader";
+import { Portfolio } from "./components/Portfolio";
 
-const drawerWidth = 260;
-
-// Create a theme instance
-const theme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: "#0052ff",
-    },
-    secondary: {
-      main: "#00c853",
-    },
-    background: {
-      default: "#121212",
-      paper: "#1e1e1e",
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  },
-  components: {
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: "none",
-        },
-      },
-    },
-  },
-});
-
-const App: React.FC = () => {
+function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const handleSidebarToggle = () => {
-    setSidebarOpen((open) => !open);
+  const handleToggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <BrowserRouter>
       <Box sx={{ display: "flex" }}>
-        <Sidebar open={sidebarOpen} onClose={handleSidebarToggle} />
-        <AppBar
-          position="fixed"
-          color="default"
-          elevation={0}
-          sx={{
-            left: sidebarOpen ? `${drawerWidth}px` : 0,
-            width: sidebarOpen ? `calc(100% - ${drawerWidth}px)` : "100%",
-            boxShadow: "none",
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            transition: (theme) =>
-              theme.transitions.create(["left", "width"], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-              }),
-          }}
-        >
-          <Toolbar sx={{ minHeight: 64 }}>
-            <IconButton
-              color="inherit"
-              aria-label={sidebarOpen ? "hide sidebar" : "show sidebar"}
-              edge="start"
-              onClick={handleSidebarToggle}
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-            {/* You can add more header content here if needed */}
-          </Toolbar>
-        </AppBar>
+        <CssBaseline />
+        <AppHeader
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={handleToggleSidebar}
+        />
+        <AppSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <Box
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            pt: 3,
+            pr: 3,
+            pb: 3,
+            paddingLeft: 0,
             width: "100%",
-            mt: 8,
+            // ml: { sm: `${sidebarOpen ? 280 : 0}px` },
+            //mt: "64px", // Height of AppBar
             transition: (theme) =>
-              theme.transitions.create(["margin"], {
+              theme.transitions.create(["margin", "width"], {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
               }),
           }}
         >
-          <Typography paragraph>
-            Welcome to Coinbase Sandbox Dashboard
-          </Typography>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+          </Routes>
         </Box>
       </Box>
-    </ThemeProvider>
+    </BrowserRouter>
   );
-};
+}
 
 export default App;
