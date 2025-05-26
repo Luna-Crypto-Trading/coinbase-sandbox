@@ -130,6 +130,9 @@ if (app.Environment.IsDevelopment())
 // Configure static files and directory browsing for the wwwroot folder
 app.UseStaticFiles();
 
+// Add a fallback route to serve the React app for client-side routing
+app.MapFallbackToFile("dashboard/{**path}", "dashboard/index.html");
+
 var wwwrootBrowserPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 if (Directory.Exists(wwwrootBrowserPath))
 {
