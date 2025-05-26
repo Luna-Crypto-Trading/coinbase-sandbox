@@ -59,7 +59,7 @@ public class AdvancedTradeController(
         public bool Success { get; set; } = true;
     }
 
-    
+
     [HttpGet("best_bid_ask")]
     public async Task<IActionResult> GetBestBidAsk(
         [FromQuery(Name = "product_ids")] List<string>? productIds = null,
@@ -116,7 +116,7 @@ public class AdvancedTradeController(
         }
     }
 
-    
+
     // GET /api/v3/brokerage/products
     [HttpGet("products")]
     public async Task<IActionResult> GetProducts(CancellationToken cancellationToken)

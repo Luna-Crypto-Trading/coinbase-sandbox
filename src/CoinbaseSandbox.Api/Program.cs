@@ -126,12 +126,16 @@ if (app.Environment.IsDevelopment())
 
 // Configure static files and directory browsing for the wwwroot folder
 app.UseStaticFiles();
-app.UseDirectoryBrowser(new DirectoryBrowserOptions
+
+var wwwrootBrowserPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+if (Directory.Exists(wwwrootBrowserPath))
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-    RequestPath = "/browser"
-});
+    app.UseDirectoryBrowser(new DirectoryBrowserOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(wwwrootBrowserPath),
+        RequestPath = "/browser"
+    });
+}
 
 // Create wwwroot directory if it doesn't exist
 var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");

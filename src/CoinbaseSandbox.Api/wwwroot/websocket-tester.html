@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coinbase Sandbox WebSocket Tester</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+        h1 {
+            color: #0052cc;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .control-panel {
+            grid-column: 1;
+        }
+        .messages {
+            grid-column: 2;
+            max-height: 700px;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #0052cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            margin-top: 10px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #003d99;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 4px solid #ddd;
+            background-color: #f8f9fa;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+        .message.sent {
+            border-left-color: #0052cc;
+        }
+        .message.received {
+            border-left-color: #00cc52;
+        }
+        .message.error {
+            border-left-color: #cc0000;
+            background-color: #fff8f8;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            font-weight: 500;
+        }
+        .status.connected {
+            background-color: #e6f7e6;
+            color: #1e7e34;
+        }
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        .controls button {
+            flex: 1;
+        }
+        .price-display {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #0052cc;
+        }
+        .product-prices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .price-card {
+            background-color: #f0f8ff;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .price-card .symbol {
+            font-weight: bold;
+        }
+        .price-card .price {
+            font-size: 18px;
+            margin-top: 5px;
+        }
+        .subscription-list {
+            margin-top: 15px;
+        }
+        .clear-button {
+            background-color: #6c757d;
+            width: auto;
+            padding: 5px 10px;
+            font-size: 12px;
+            float: right;
+        }
+        .ticker-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+<h1>Coinbase Sandbox WebSocket Tester</h1>
+
+<div class="container">
+    <div class="control-panel">
+        <div class="card">
+            <h2>Connection</h2>
+            <div class="form-group">
+                <label for="ws-url">WebSocket URL:</label>
+                <input type="text" id="ws-url" value="ws://localhost:5226/ws" />
+            </div>
+            <div class="controls">
+                <button id="connect">Connect</button>
+                <button id="disconnect" disabled>Disconnect</button>
+            </div>
+            <div id="connection-status" class="status disconnected">Disconnected</div>
+        </div>
+
+        <div class="card">
+            <h2>Subscribe</h2>
+            <div class="form-group">
+                <label for="product-id">Product:</label>
+                <select id="product-id">
+                    <option value="BTC-USD">BTC-USD</option>
+                    <option value="ETH-USD">ETH-USD</option>
+                    <option value="SOL-USD">SOL-USD</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="channel">Channel:</label>
+                <select id="channel">
+                    <option value="ticker">Ticker</option>
+                    <option value="level2">Order Book (Level 2)</option>
+                    <option value="heartbeat">Heartbeat</option>
+                </select>
+            </div>
+            <div class="controls">
+                <button id="subscribe" disabled>Subscribe</button>
+                <button id="unsubscribe" disabled>Unsubscribe</button>
+            </div>
+
+            <div class="subscription-list">
+                <h3>Active Subscriptions</h3>
+                <div id="subscriptions"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Price Control</h2>
+            <div class="form-group">
+                <label for="price-product">Product:</label>
+                <select id="price-product">
+                    <option value="BTC-USD">BTC-USD</option>
+                    <option value="ETH-USD">ETH-USD</option>
+                    <option value="SOL-USD">SOL-USD</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="price-value">Price:</label>
+                <input type="number" id="price-value" value="50000.00" step="0.01" />
+            </div>
+            <button id="set-price">Set Price</button>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="simulation-type">Simulation Type:</label>
+                <select id="simulation-type">
+                    <option value="trend">Trend</option>
+                    <option value="volatility">Volatility</option>
+                </select>
+            </div>
+            <div id="trend-options">
+                <div class="form-group">
+                    <label for="start-price">Start Price:</label>
+                    <input type="number" id="start-price" value="50000.00" step="0.01" />
+                </div>
+                <div class="form-group">
+                    <label for="end-price">End Price:</label>
+                    <input type="number" id="end-price" value="55000.00" step="0.01" />
+                </div>
+            </div>
+            <div id="volatility-options" style="display: none;">
+                <div class="form-group">
+                    <label for="base-price">Base Price:</label>
+                    <input type="number" id="base-price" value="50000.00" step="0.01" />
+                </div>
+                <div class="form-group">
+                    <label for="volatility-percent">Volatility %:</label>
+                    <input type="number" id="volatility-percent" value="2.0" step="0.1" min="0.1" max="20" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="duration">Duration (seconds):</label>
+                <input type="number" id="duration" value="60" min="10" />
+            </div>
+            <div class="form-group">
+                <label for="repeat">Repeat:</label>
+                <select id="repeat">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+            </div>
+            <div class="controls">
+                <button id="start-simulation">Start Simulation</button>
+                <button id="stop-simulation">Stop Simulation</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Current Prices</h2>
+            <div class="product-prices" id="current-prices">
+                <!-- Price cards will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="messages card">
+        <h2>Messages <button id="clear-messages" class="clear-button">Clear</button></h2>
+        <div id="message-log"></div>
+    </div>
+</div>
+
+<script>
+    // DOM Elements
+    const connectBtn = document.getElementById('connect');
+    const disconnectBtn = document.getElementById('disconnect');
+    const subscribeBtn = document.getElementById('subscribe');
+    const unsubscribeBtn = document.getElementById('unsubscribe');
+    const clearMessagesBtn = document.getElementById('clear-messages');
+    const setPriceBtn = document.getElementById('set-price');
+    const startSimulationBtn = document.getElementById('start-simulation');
+    const stopSimulationBtn = document.getElementById('stop-simulation');
+
+    const wsUrlInput = document.getElementById('ws-url');
+    const productIdSelect = document.getElementById('product-id');
+    const channelSelect = document.getElementById('channel');
+    const priceProductSelect = document.getElementById('price-product');
+    const priceValueInput = document.getElementById('price-value');
+    const simulationTypeSelect = document.getElementById('simulation-type');
+
+    const connectionStatus = document.getElementById('connection-status');
+    const messageLog = document.getElementById('message-log');
+    const subscriptionsDiv = document.getElementById('subscriptions');
+    const currentPricesDiv = document.getElementById('current-prices');
+
+    const trendOptions = document.getElementById('trend-options');
+    const volatilityOptions = document.getElementById('volatility-options');
+
+    // State
+    let socket = null;
+    let activeSubscriptions = new Set();
+    let currentPrices = {};
+
+    // Event Listeners
+    connectBtn.addEventListener('click', connect);
+    disconnectBtn.addEventListener('click', disconnect);
+    subscribeBtn.addEventListener('click', subscribe);
+    unsubscribeBtn.addEventListener('click', unsubscribe);
+    clearMessagesBtn.addEventListener('click', clearMessages);
+    setPriceBtn.addEventListener('click', setPrice);
+    startSimulationBtn.addEventListener('click', startSimulation);
+    stopSimulationBtn.addEventListener('click', stopSimulation);
+
+    simulationTypeSelect.addEventListener('change', function() {
+        if (this.value === 'trend') {
+            trendOptions.style.display = 'block';
+            volatilityOptions.style.display = 'none';
+        } else {
+            trendOptions.style.display = 'none';
+            volatilityOptions.style.display = 'block';
+        }
+    });
+
+    // Functions
+    function connect() {
+        const url = wsUrlInput.value;
+        try {
+            socket = new WebSocket(url);
+
+            socket.onopen = function() {
+                logMessage('WebSocket connection established', 'status');
+                connectionStatus.textContent = 'Connected';
+                connectionStatus.className = 'status connected';
+
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                subscribeBtn.disabled = false;
+                unsubscribeBtn.disabled = false;
+            };
+
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                logMessage(JSON.stringify(data, null, 2), 'received');
+
+                handleIncomingMessage(data);
+            };
+
+            socket.onclose = function(event) {
+                logMessage(`WebSocket connection closed: ${event.reason || 'Unknown reason'}`, 'status');
+                connectionStatus.textContent = 'Disconnected';
+                connectionStatus.className = 'status disconnected';
+
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                subscribeBtn.disabled = true;
+                unsubscribeBtn.disabled = true;
+
+                socket = null;
+                activeSubscriptions.clear();
+                updateSubscriptionsDisplay();
+            };
+
+            socket.onerror = function(error) {
+                logMessage(`WebSocket error: ${error.message || 'Unknown error'}`, 'error');
+            };
+
+        } catch (error) {
+            logMessage(`Failed to connect: ${error.message}`, 'error');
+        }
+    }
+
+    function disconnect() {
+        if (socket) {
+            socket.close();
+        }
+    }
+
+    function subscribe() {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            logMessage('Cannot subscribe: WebSocket is not connected', 'error');
+            return;
+        }
+
+        const productId = productIdSelect.value;
+        const channel = channelSelect.value;
+        const subscriptionKey = `${channel}:${productId}`;
+
+        if (activeSubscriptions.has(subscriptionKey)) {
+            logMessage(`Already subscribed to ${channel} for ${productId}`, 'error');
+            return;
+        }
+
+        const message = {
+            type: 'subscribe',
+            product_ids: [productId],
+            channels: [channel]
+        };
+
+        socket.send(JSON.stringify(message));
+        logMessage(JSON.stringify(message, null, 2), 'sent');
+
+        activeSubscriptions.add(subscriptionKey);
+        updateSubscriptionsDisplay();
+    }
+
+    function unsubscribe() {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            logMessage('Cannot unsubscribe: WebSocket is not connected', 'error');
+            return;
+        }
+
+        const productId = productIdSelect.value;
+        const channel = channelSelect.value;
+        const subscriptionKey = `${channel}:${productId}`;
+
+        if (!activeSubscriptions.has(subscriptionKey)) {
+            logMessage(`Not subscribed to ${channel} for ${productId}`, 'error');
+            return;
+        }
+
+        const message = {
+            type: 'unsubscribe',
+            product_ids: [productId],
+            channels: [channel]
+        };
+
+        socket.send(JSON.stringify(message));
+        logMessage(JSON.stringify(message, null, 2), 'sent');
+
+        activeSubscriptions.delete(subscriptionKey);
+        updateSubscriptionsDisplay();
+    }
+
+    function setPrice() {
+        const productId = priceProductSelect.value;
+        const price = parseFloat(priceValueInput.value);
+
+        if (isNaN(price) || price <= 0) {
+            logMessage('Invalid price value', 'error');
+            return;
+        }
+
+        fetch(`http://localhost:5226/api/v3/brokerage/sandbox/prices/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(price)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                logMessage(`Successfully set price for ${productId}: ${price}`, 'status');
+                logMessage(JSON.stringify(data, null, 2), 'received');
+            })
+            .catch(error => {
+                logMessage(`Error setting price: ${error.message}`, 'error');
+            });
+    }
+
+    function startSimulation() {
+        const productId = priceProductSelect.value;
+        const simulationType = simulationTypeSelect.value;
+        const duration = parseInt(document.getElementById('duration').value);
+        const repeat = document.getElementById('repeat').value === 'true';
+
+        let requestBody = {
+            mode: simulationType,
+            durationSeconds: duration,
+            repeat: repeat
+        };
+
+        if (simulationType === 'trend') {
+            requestBody.startPrice = parseFloat(document.getElementById('start-price').value);
+            requestBody.endPrice = parseFloat(document.getElementById('end-price').value);
+        } else { // volatility
+            requestBody.basePrice = parseFloat(document.getElementById('base-price').value);
+            requestBody.volatilityPercent = parseFloat(document.getElementById('volatility-percent').value);
+        }
+
+        fetch(`http://localhost:5226/api/v3/sandbox/prices/${productId}/simulate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                logMessage(`Successfully started ${simulationType} simulation for ${productId}`, 'status');
+                logMessage(JSON.stringify(data, null, 2), 'received');
+            })
+            .catch(error => {
+                logMessage(`Error starting simulation: ${error.message}`, 'error');
+            });
+    }
+
+    function stopSimulation() {
+        const productId = priceProductSelect.value;
+
+        fetch(`http://localhost:5226/api/v3/sandbox/prices/${productId}/simulation`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                logMessage(`Successfully stopped simulation for ${productId}`, 'status');
+                logMessage(JSON.stringify(data, null, 2), 'received');
+            })
+            .catch(error => {
+                logMessage(`Error stopping simulation: ${error.message}`, 'error');
+            });
+    }
+
+    function logMessage(message, type) {
+        const msgElement = document.createElement('div');
+        msgElement.className = `message ${type}`;
+        msgElement.textContent = message;
+
+        messageLog.appendChild(msgElement);
+        messageLog.scrollTop = messageLog.scrollHeight;
+    }
+
+    function clearMessages() {
+        messageLog.innerHTML = '';
+    }
+
+    function updateSubscriptionsDisplay() {
+        subscriptionsDiv.innerHTML = '';
+
+        if (activeSubscriptions.size === 0) {
+            subscriptionsDiv.textContent = 'No active subscriptions';
+            return;
+        }
+
+        const list = document.createElement('ul');
+
+        for (const subscription of activeSubscriptions) {
+            const [channel, productId] = subscription.split(':');
+
+            const item = document.createElement('li');
+            item.textContent = `${channel} - ${productId}`;
+            list.appendChild(item);
+        }
+
+        subscriptionsDiv.appendChild(list);
+    }
+
+    function handleIncomingMessage(data) {
+        if (data.type === 'ticker') {
+            const productId = data.product_id;
+            const price = parseFloat(data.price);
+            const time = data.time;
+
+            currentPrices[productId] = {
+                price,
+                time
+            };
+
+            updatePriceDisplay();
+        }
+    }
+
+    function updatePriceDisplay() {
+        currentPricesDiv.innerHTML = '';
+
+        for (const [productId, data] of Object.entries(currentPrices)) {
+            const card = document.createElement('div');
+            card.className = 'price-card';
+
+            const symbol = document.createElement('div');
+            symbol.className = 'symbol';
+            symbol.textContent = productId;
+
+            const price = document.createElement('div');
+            price.className = 'price';
+            price.textContent = `$${data.price.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`;
+
+            const time = document.createElement('div');
+            time.className = 'ticker-time';
+            time.textContent = new Date(data.time).toLocaleTimeString();
+
+            card.appendChild(symbol);
+            card.appendChild(price);
+            card.appendChild(time);
+
+            currentPricesDiv.appendChild(card);
+        }
+    }
+
+    // Initialize
+    updateSubscriptionsDisplay();
+</script>
+</body>
+</html>
