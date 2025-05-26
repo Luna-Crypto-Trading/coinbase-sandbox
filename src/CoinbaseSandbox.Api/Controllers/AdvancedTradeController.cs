@@ -536,12 +536,53 @@ public class AdvancedTradeController(
         return Ok(response);
     }
 
+    // DELETE /api/v3/brokerage/orders/{order_id} - Single order cancellation
+    [HttpDelete("orders/{orderId}")]
+    public async Task<IActionResult> CancelOrder(Guid orderId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var order = await orderService.CancelOrderAsync(orderId, cancellationToken);
+
+            // Format response to match Coinbase API format
+            var response = new
+            {
+                success = true,
+                order = new
+                {
+                    order_id = order.Id.ToString(),
+                    product_id = order.ProductId,
+                    side = order.Side.ToString().ToLower(),
+                    order_type = order.Type.ToString().ToLower(),
+                    status = order.Status.ToString().ToLower(),
+                    created_time = order.CreatedAt.ToString("o"),
+                    base_size = order.Size.ToString(),
+                    limit_price = order.LimitPrice?.ToString(),
+                    filled_size = order.Status == OrderStatus.Filled ? order.Size.ToString() : "0",
+                    filled_price = order.ExecutedPrice?.ToString(),
+                    fee = order.Fee?.ToString()
+                }
+            };
+
+            return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new { error = $"Order {orderId} not found" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     public class CancelOrdersRequest
     {
         public List<string> order_ids { get; set; } = new List<string>();
     }
 
     #endregion
+
     private async Task<IActionResult> GetMockBestBidAskAsync(
         List<string> productIds,
         CancellationToken cancellationToken)
@@ -625,6 +666,44 @@ public class AdvancedTradeController(
         return Ok(response);
     }
 
+    // GET /api/v3/brokerage/accounts/{account_id}
+    [HttpGet("accounts/{accountId}")]
+    public async Task<IActionResult> GetAccount(string accountId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var wallet = await walletService.GetWalletAsync(accountId, cancellationToken);
+
+            // Format response to match Coinbase API format
+            var response = new
+            {
+                account = new
+                {
+                    uuid = accountId,
+                    name = wallet.Name,
+                    currency = wallet.Assets.FirstOrDefault()?.Currency.Symbol ?? "USD",
+                    available_balance = new
+                    {
+                        value = wallet.Assets.FirstOrDefault()?.Balance.ToString() ?? "0",
+                        currency = wallet.Assets.FirstOrDefault()?.Currency.Symbol ?? "USD"
+                    },
+                    isDefault = true,
+                    active = true,
+                    created_at = DateTime.UtcNow.AddDays(-30).ToString("o"),
+                    updated_at = DateTime.UtcNow.ToString("o"),
+                    deleted_at = (string)null,
+                    type = "ACCOUNT_TYPE_CRYPTO"
+                }
+            };
+
+            return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new { error = $"Account {accountId} not found" });
+        }
+    }
+
     #endregion
 
     #region Sandbox-Specific Endpoints
@@ -655,6 +734,90 @@ public class AdvancedTradeController(
         {
             return BadRequest(new { error = ex.Message });
         }
+    }
+
+    // POST /api/v3/brokerage/sandbox/accounts/{account_id}/deposit
+    [HttpPost("sandbox/accounts/{accountId}/deposit")]
+    public async Task<IActionResult> DepositFunds(
+        string accountId,
+        [FromBody] DepositRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var asset = await walletService.DepositAsync(accountId, request.Currency, request.Amount, cancellationToken);
+
+            return Ok(new
+            {
+                success = true,
+                account_id = accountId,
+                currency = asset.Currency.Symbol,
+                amount = request.Amount.ToString(),
+                new_balance = asset.Balance.ToString(),
+                timestamp = DateTime.UtcNow.ToString("o")
+            });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new { error = $"Account {accountId} not found" });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    // POST /api/v3/brokerage/sandbox/accounts/{account_id}/withdraw
+    [HttpPost("sandbox/accounts/{accountId}/withdraw")]
+    public async Task<IActionResult> WithdrawFunds(
+        string accountId,
+        [FromBody] WithdrawRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var asset = await walletService.WithdrawAsync(accountId, request.Currency, request.Amount, cancellationToken);
+
+            return Ok(new
+            {
+                success = true,
+                account_id = accountId,
+                currency = asset.Currency.Symbol,
+                amount = request.Amount.ToString(),
+                new_balance = asset.Balance.ToString(),
+                timestamp = DateTime.UtcNow.ToString("o")
+            });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new { error = $"Account {accountId} not found" });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    public class DepositRequest
+    {
+        [JsonPropertyName("currency")]
+        public string Currency { get; set; } = string.Empty;
+
+        [JsonPropertyName("amount")]
+        public decimal Amount { get; set; }
+    }
+
+    public class WithdrawRequest
+    {
+        [JsonPropertyName("currency")]
+        public string Currency { get; set; } = string.Empty;
+
+        [JsonPropertyName("amount")]
+        public decimal Amount { get; set; }
     }
 
     #endregion
