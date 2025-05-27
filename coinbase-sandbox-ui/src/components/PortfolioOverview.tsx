@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Card,
@@ -7,38 +7,12 @@ import {
   Grid,
   CircularProgress,
 } from "@mui/material";
-
-interface Account {
-  uuid: string;
-  name: string;
-  currency: string;
-  available_balance: {
-    value: string;
-    currency: string;
-  };
-  isDefault: boolean;
-  active: boolean;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  type: string;
-}
+import { useAccounts } from "../hooks/useAccounts";
 
 export const PortfolioOverview: React.FC = () => {
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: accounts, isLoading } = useAccounts();
 
-  useEffect(() => {
-    fetch("/api/v3/brokerage/accounts")
-      .then((res) => res.json())
-      .then((data) => {
-        setAccounts(data.accounts || []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return <CircularProgress />;
   }
 
@@ -48,8 +22,8 @@ export const PortfolioOverview: React.FC = () => {
         Portfolio Overview
       </Typography>
       <Grid container spacing={2}>
-        {accounts.map((account) => (
-          <Grid xs={12} sm={6} md={3} key={account.uuid}>
+        {accounts?.map((account) => (
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={account.uuid}>
             <Card>
               <CardContent>
                 <Typography variant="subtitle2" color="text.secondary">

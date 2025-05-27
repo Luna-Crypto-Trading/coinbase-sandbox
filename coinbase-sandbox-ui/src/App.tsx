@@ -6,6 +6,7 @@ import { AppSidebar } from "./components/AppSidebar";
 import { Dashboard } from "./components/Dashboard";
 import { AppHeader } from "./components/AppHeader";
 import { Portfolio } from "./components/Portfolio";
+import { WebSocketDebug } from "./components/WebSocketDebug";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -30,10 +31,8 @@ function App() {
             pt: 3,
             pr: 3,
             pb: 3,
-            paddingLeft: 0,
+            pl: 0,
             width: "100%",
-            // ml: { sm: `${sidebarOpen ? 280 : 0}px` },
-            //mt: "64px", // Height of AppBar
             transition: (theme) =>
               theme.transitions.create(["margin", "width"], {
                 easing: theme.transitions.easing.sharp,
@@ -44,6 +43,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/debug" element={<WebSocketDebug />} />
           </Routes>
         </Box>
       </Box>
