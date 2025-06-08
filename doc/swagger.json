@@ -1,0 +1,1670 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Coinbase Sandbox API",
+    "description": "A sandbox API that mimics the Coinbase Advanced Trade API but only mocks order execution, account balances, and wallet operations",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/v3/brokerage/best_bid_ask": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "product_ids",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/products": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/products/{productId}": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/products/{productId}/candles": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "granularity",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/products/{productId}/ticker": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/products/{productId}/book": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/orders": {
+      "post": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/orders/historical/{orderId}": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/orders/historical": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/orders/batch_cancel": {
+      "post": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrdersRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrdersRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrdersRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/orders/{orderId}": {
+      "delete": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/accounts": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/accounts/{accountId}": {
+      "get": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/sandbox/prices/{productId}": {
+      "post": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "number",
+                "format": "double"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/sandbox/accounts/{accountId}/deposit": {
+      "post": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/brokerage/sandbox/accounts/{accountId}/withdraw": {
+      "post": {
+        "tags": [
+          "AdvancedTrade"
+        ],
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/backtest/run": {
+      "post": {
+        "tags": [
+          "Backtest"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunBacktestRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunBacktestRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunBacktestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/backtest/strategies": {
+      "get": {
+        "tags": [
+          "Backtest"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Backtest"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BacktestStrategy"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BacktestStrategy"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BacktestStrategy"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/backtest/strategies/{name}": {
+      "get": {
+        "tags": [
+          "Backtest"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/backtest/results": {
+      "get": {
+        "tags": [
+          "Backtest"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/backtest/results/{id}": {
+      "get": {
+        "tags": [
+          "Backtest"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/websocket-tester": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/dashboard/dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/notifications/subscribe/price-alerts": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeToPriceAlertsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeToPriceAlertsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeToPriceAlertsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/notifications/unsubscribe/price-alerts/{productId}": {
+      "delete": {
+        "tags": [
+          "Notifications"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/sandbox/prices/{productId}": {
+      "post": {
+        "tags": [
+          "Sandbox"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "number",
+                "format": "double"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/sandbox/prices/{productId}/simulate": {
+      "post": {
+        "tags": [
+          "Sandbox"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceSimulationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceSimulationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceSimulationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/sandbox/prices/{productId}/simulation": {
+      "delete": {
+        "tags": [
+          "Sandbox"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/sandbox/wallets": {
+      "post": {
+        "tags": [
+          "Sandbox"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWalletRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWalletRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWalletRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/sandbox/wallets/{walletId}/reset": {
+      "post": {
+        "tags": [
+          "Sandbox"
+        ],
+        "parameters": [
+          {
+            "name": "walletId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AssetBalance"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AssetBalance"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AssetBalance"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/sandbox/reset": {
+      "post": {
+        "tags": [
+          "Sandbox"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/sandbox/state": {
+      "get": {
+        "tags": [
+          "Sandbox"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v3/sandbox/scenarios": {
+      "post": {
+        "tags": [
+          "Sandbox"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/technical-analysis/{productId}/indicators": {
+      "get": {
+        "tags": [
+          "TechnicalAnalysis"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/technical-analysis/{productId}/sma": {
+      "get": {
+        "tags": [
+          "TechnicalAnalysis"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "periods",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "10,20,50,200"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/technical-analysis/{productId}/ema": {
+      "get": {
+        "tags": [
+          "TechnicalAnalysis"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "periods",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "9,12,26"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/technical-analysis/{productId}/rsi": {
+      "get": {
+        "tags": [
+          "TechnicalAnalysis"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 14
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/technical-analysis/{productId}/bollinger-bands": {
+      "get": {
+        "tags": [
+          "TechnicalAnalysis"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "standardDeviations",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "default": 2
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AssetBalance": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "balance": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssetSetup": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "nullable": true
+          },
+          "balance": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AttachedOrderConfiguration": {
+        "type": "object",
+        "properties": {
+          "market_market_ioc": {
+            "$ref": "#/components/schemas/MarketMarketIoc"
+          },
+          "sor_limit_ioc": {
+            "$ref": "#/components/schemas/SorLimitIoc"
+          },
+          "limit_limit_gtc": {
+            "$ref": "#/components/schemas/LimitLimitGtc"
+          },
+          "limit_limit_gtd": {
+            "$ref": "#/components/schemas/LimitLimitGtd"
+          },
+          "limit_limit_fok": {
+            "$ref": "#/components/schemas/LimitLimitFok"
+          },
+          "twap_limit_gtd": {
+            "$ref": "#/components/schemas/TwapLimitGtd"
+          },
+          "stop_limit_stop_limit_gtc": {
+            "$ref": "#/components/schemas/StopLimitStopLimitGtc"
+          },
+          "stop_limit_stop_limit_gtd": {
+            "$ref": "#/components/schemas/StopLimitStopLimitGtd"
+          },
+          "trigger_bracket_gtc": {
+            "$ref": "#/components/schemas/TriggerBracketGtc"
+          },
+          "trigger_bracket_gtd": {
+            "$ref": "#/components/schemas/TriggerBracketGtd"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BacktestStrategy": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "parameters": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CancelOrdersRequest": {
+        "type": "object",
+        "properties": {
+          "order_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateOrderRequest": {
+        "type": "object",
+        "properties": {
+          "client_order_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "product_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "side": {
+            "type": "string",
+            "nullable": true
+          },
+          "order_configuration": {
+            "$ref": "#/components/schemas/OrderConfiguration"
+          },
+          "leverage": {
+            "type": "string",
+            "nullable": true
+          },
+          "margin_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "retail_portfolio_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "preview_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "attached_order_configuration": {
+            "$ref": "#/components/schemas/AttachedOrderConfiguration"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateWalletRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "initialBalances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetBalance"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DepositRequest": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LimitLimitFok": {
+        "type": "object",
+        "properties": {
+          "quote_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LimitLimitGtc": {
+        "type": "object",
+        "properties": {
+          "quote_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "post_only": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LimitLimitGtd": {
+        "type": "object",
+        "properties": {
+          "quote_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "end_time": {
+            "type": "string",
+            "nullable": true
+          },
+          "post_only": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MarketMarketIoc": {
+        "type": "object",
+        "properties": {
+          "quote_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderConfiguration": {
+        "type": "object",
+        "properties": {
+          "market_market_ioc": {
+            "$ref": "#/components/schemas/MarketMarketIoc"
+          },
+          "sor_limit_ioc": {
+            "$ref": "#/components/schemas/SorLimitIoc"
+          },
+          "limit_limit_gtc": {
+            "$ref": "#/components/schemas/LimitLimitGtc"
+          },
+          "limit_limit_gtd": {
+            "$ref": "#/components/schemas/LimitLimitGtd"
+          },
+          "limit_limit_fok": {
+            "$ref": "#/components/schemas/LimitLimitFok"
+          },
+          "twap_limit_gtd": {
+            "$ref": "#/components/schemas/TwapLimitGtd"
+          },
+          "stop_limit_stop_limit_gtc": {
+            "$ref": "#/components/schemas/StopLimitStopLimitGtc"
+          },
+          "stop_limit_stop_limit_gtd": {
+            "$ref": "#/components/schemas/StopLimitStopLimitGtd"
+          },
+          "trigger_bracket_gtc": {
+            "$ref": "#/components/schemas/TriggerBracketGtc"
+          },
+          "trigger_bracket_gtd": {
+            "$ref": "#/components/schemas/TriggerBracketGtd"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PriceSimulationRequest": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "nullable": true
+          },
+          "startPrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "endPrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "durationSeconds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "volatilityPercent": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "historicalDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "repeat": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RunBacktestRequest": {
+        "type": "object",
+        "properties": {
+          "strategyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "initialBalance": {
+            "type": "number",
+            "format": "double"
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ScenarioRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "prices": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            },
+            "nullable": true
+          },
+          "wallets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WalletSetup"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SorLimitIoc": {
+        "type": "object",
+        "properties": {
+          "quote_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StopLimitStopLimitGtc": {
+        "type": "object",
+        "properties": {
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "stop_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "stop_direction": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StopLimitStopLimitGtd": {
+        "type": "object",
+        "properties": {
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "stop_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "end_time": {
+            "type": "string",
+            "nullable": true
+          },
+          "stop_direction": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubscribeToPriceAlertsRequest": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "threshold": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TriggerBracketGtc": {
+        "type": "object",
+        "properties": {
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "stop_trigger_price": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TriggerBracketGtd": {
+        "type": "object",
+        "properties": {
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "stop_trigger_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "end_time": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TwapLimitGtd": {
+        "type": "object",
+        "properties": {
+          "quote_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "base_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "start_time": {
+            "type": "string",
+            "nullable": true
+          },
+          "end_time": {
+            "type": "string",
+            "nullable": true
+          },
+          "limit_price": {
+            "type": "string",
+            "nullable": true
+          },
+          "number_buckets": {
+            "type": "string",
+            "nullable": true
+          },
+          "bucket_size": {
+            "type": "string",
+            "nullable": true
+          },
+          "bucket_duration": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WalletSetup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true
+          },
+          "assets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetSetup"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WithdrawRequest": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "CoinbaseApiKey": {
+        "type": "apiKey",
+        "description": "Coinbase API Key authentication using the CB-ACCESS-KEY header",
+        "name": "CB-ACCESS-KEY",
+        "in": "header"
+      },
+      "Bearer": {
+        "type": "http",
+        "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "CoinbaseApiKey": [ ],
+      "Bearer": [ ]
+    }
+  ]
+}
