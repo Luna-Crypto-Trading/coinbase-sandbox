@@ -54,7 +54,13 @@ public class CoinbaseApiClient(HttpClient httpClient, ILogger<CoinbaseApiClient>
 
             // Parse and return the response
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
-            return JsonSerializer.Deserialize<T>(content);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = null, // Keep original property names
+                PropertyNameCaseInsensitive = true // Allow case-insensitive matching
+            };
+            
+            return JsonSerializer.Deserialize<T>(content, options);
         }
         catch (Exception ex)
         {
