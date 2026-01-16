@@ -43,54 +43,53 @@ services:
       - coinbase-sandbox
 ```
 
-## 📖 Documentation
+## Documentation
 
 - **[Complete Feature Documentation](SANDBOX_FEATURES.md)** - Comprehensive guide to all sandbox features and API endpoints
 - **[Setup Guide](setup_guide.md)** - Detailed setup and configuration instructions
-- **[WebSocket Tester](websocker-tester.html)** - Interactive WebSocket testing tool
 
 ## Features
 
-### 🔄 API Compatibility
+### API Compatibility
 
 - **Drop-in Replacement**: Just change the base URL in your client - no code changes needed
 - **Identical API Endpoints**: Mimics the exact same routes and response formats as the real Coinbase Advanced Trade API
 - **Authentication Support**: Uses your real API keys for market data access (but never touches your real funds)
 
-### 📈 Market Data
+### Market Data (Passthrough)
 
 - **Real-time Prices**: Get actual market prices from the Coinbase API
 - **Product Listings**: Access the complete catalog of tradable assets
 - **Candlestick Data**: Historical price data with the same format as production
 - **Order Book Depth**: Real market order book data for testing your strategies
+- **Best Bid/Ask**: Get best bid and ask prices for products
 
-### 💰 Simulated Trading
+### Simulated Trading
 
 - **Virtual Account Balances**: Start with configurable virtual balances
 - **Order Execution**: Place market and limit orders that execute against real-time prices
 - **Trade History**: Track all your simulated trades
 - **Fee Calculation**: Realistic fee calculation for accurate P&L testing
+- **Deposit/Withdraw**: Simulate deposits and withdrawals for testing
 
-### 📊 Analysis & Testing
+### Analysis and Testing
 
 - **Technical Indicators**: Calculate SMAs, EMAs, RSI, Bollinger Bands and more
 - **Backtesting Engine**: Test trading strategies against historical data
-- **Price Simulation**: Create custom price scenarios (trend, volatility, replay)
+- **Price Simulation**: Create custom price scenarios (trend, volatility)
 - **Scenario Testing**: Pre-built scenarios for bull markets, bear markets, and high volatility
 
-### 🔌 WebSockets
+### WebSockets
 
 - **Real-time Updates**: WebSocket connection mimicking Coinbase's service
 - **Price Tickers**: Subscribe to real-time price updates
 - **Order Book Updates**: Level 2 market data streaming
-- **Interactive Tester**: Browser-based WebSocket testing tool
 
-### 🔍 Debugging & Monitoring
+### State Management
 
-- **Sandbox Dashboard**: Visualize current state and trading activity
-- **State Management**: View and reset the sandbox state
+- **Sandbox State**: View and reset the sandbox state
 - **Transaction Log**: Record of all simulated trading activity
-- **Notification System**: Trade and price alert notifications
+- **Notification System**: Price alert notifications
 
 ## Getting Started
 
@@ -126,9 +125,11 @@ docker run -p 5226:5226 ghcr.io/milesangelo/coinbase-sandbox:latest
    - HTTP: http://localhost:5226
    - HTTPS: https://localhost:7194
 
-4. Access the Swagger documentation at:
+4. Access the Swagger documentation (Development mode only):
    - HTTP: http://localhost:5226/swagger
    - HTTPS: https://localhost:7194/swagger
+
+   Note: Swagger UI is only available when running in Development mode (the default when using `dotnet run`).
 
 ### Usage
 
@@ -151,15 +152,9 @@ docker run -p 5226:5226 ghcr.io/milesangelo/coinbase-sandbox:latest
    - For specific testing scenarios, use the special sandbox endpoint to override prices
    - `POST /api/v3/brokerage/sandbox/prices/{productId}` with a price value
 
-5. **Try the WebSocket tester**:
-   - Open http://localhost:5226/websocket-tester.html in your browser
-   - Connect to the WebSocket server and subscribe to price updates
-   - Visualize real-time price changes and order book updates
-
-6. **Access the Dashboard**:
-   - Navigate to http://localhost:5226/dashboard.html
-   - View account balances, order history, and price charts
-   - Monitor the state of your sandbox
+5. **Connect via WebSocket**:
+   - Connect to `ws://localhost:5226/ws` for real-time price updates
+   - Subscribe to price tickers and order book updates
 
 ## API Endpoints
 
@@ -172,31 +167,37 @@ The sandbox implements the same endpoints as the Coinbase Advanced Trade API plu
 - `GET /api/v3/brokerage/products/{product_id}/candles` - Get price history
 - `GET /api/v3/brokerage/products/{product_id}/ticker` - Get recent trades
 - `GET /api/v3/brokerage/products/{product_id}/book` - Get order book
+- `GET /api/v3/brokerage/best_bid_ask` - Get best bid/ask for products
 
 ### Standard Coinbase API Endpoints (Simulated)
 
 - `POST /api/v3/brokerage/orders` - Place an order (simulated)
 - `GET /api/v3/brokerage/orders/historical/{order_id}` - Get a specific order
 - `GET /api/v3/brokerage/orders/historical` - Get all orders
-- `POST /api/v3/brokerage/orders/batch_cancel` - Cancel orders
+- `POST /api/v3/brokerage/orders/batch_cancel` - Cancel multiple orders
+- `DELETE /api/v3/brokerage/orders/{order_id}` - Cancel a single order
 - `GET /api/v3/brokerage/accounts` - Get all accounts (simulated balances)
+- `GET /api/v3/brokerage/accounts/{account_id}` - Get a specific account
 
 ### Sandbox-Specific Endpoints
 
 #### Price Control
 
 - `POST /api/v3/brokerage/sandbox/prices/{productId}` - Set a static price
+- `POST /api/v3/sandbox/prices/{productId}` - Set a static price (alternative route)
 - `POST /api/v3/sandbox/prices/{productId}/simulate` - Simulate price movements (trend/volatility)
 - `DELETE /api/v3/sandbox/prices/{productId}/simulation` - Stop price simulation
 
-#### Wallet Management
+#### Wallet and Account Management
 
 - `POST /api/v3/sandbox/wallets` - Create a custom wallet with specified balances
 - `POST /api/v3/sandbox/wallets/{walletId}/reset` - Reset wallet balances
+- `POST /api/v3/brokerage/sandbox/accounts/{accountId}/deposit` - Deposit funds to an account
+- `POST /api/v3/brokerage/sandbox/accounts/{accountId}/withdraw` - Withdraw funds from an account
 
 #### Scenario Testing
 
-- `POST /api/v3/sandbox/scenarios` - Set up predefined test scenarios (bull/bear/volatile)
+- `POST /api/v3/sandbox/scenarios` - Set up predefined test scenarios (bullrun/bearmarket/volatility)
 
 #### System State
 
@@ -215,6 +216,8 @@ The sandbox implements the same endpoints as the Coinbase Advanced Trade API plu
 
 - `POST /api/backtest/run` - Run a backtest with a specific strategy
 - `GET /api/backtest/strategies` - Get available backtest strategies
+- `GET /api/backtest/strategies/{name}` - Get a specific strategy details
+- `POST /api/backtest/strategies` - Save a new backtest strategy
 - `GET /api/backtest/results` - Get backtest results
 - `GET /api/backtest/results/{id}` - Get specific backtest result
 
@@ -260,12 +263,12 @@ The sandbox offers endpoints for testing specific price scenarios:
 ```csharp
 // Example: Test a specific price point for BTC-USD
 await httpClient.PostAsync(
-    "http://localhost:5226/api/v3/brokerage/sandbox/prices/BTC-USD", 
+    "http://localhost:5226/api/v3/brokerage/sandbox/prices/BTC-USD",
     new StringContent("80000", Encoding.UTF8, "application/json"));
 
 // Example: Simulate a bull market trend
 await httpClient.PostAsync(
-    "http://localhost:5226/api/v3/sandbox/prices/BTC-USD/simulate", 
+    "http://localhost:5226/api/v3/sandbox/prices/BTC-USD/simulate",
     new StringContent(JsonSerializer.Serialize(new {
         mode = "trend",
         startPrice = 70000,
@@ -273,16 +276,36 @@ await httpClient.PostAsync(
         durationSeconds = 3600,
         repeat = true
     }), Encoding.UTF8, "application/json"));
+
+// Example: Set up a predefined scenario (bullrun, bearmarket, or volatility)
+await httpClient.PostAsync(
+    "http://localhost:5226/api/v3/sandbox/scenarios",
+    new StringContent(JsonSerializer.Serialize(new {
+        name = "bullrun"
+    }), Encoding.UTF8, "application/json"));
 ```
 
 ## Architecture
 
 The project is built using Clean Architecture principles with Domain-Driven Design:
 
-- **Domain Layer**: Core business logic and entities
-- **Application Layer**: Use cases and application services
-- **Infrastructure Layer**: External services and data persistence
-- **API Layer**: HTTP endpoints and controllers
+```
+src/
+├── CoinbaseSandbox.Api/           # API Layer - HTTP endpoints and controllers
+│   ├── Controllers/               # REST API controllers
+│   ├── WebSockets/                # WebSocket handling
+│   └── wwwroot/                   # Static files
+├── CoinbaseSandbox.Application/   # Application Layer - Use cases and services
+├── CoinbaseSandbox.Domain/        # Domain Layer - Core business logic and entities
+└── CoinbaseSandbox.Infrastructure/ # Infrastructure Layer - External services and repositories
+tests/
+└── IntegrationTests/              # Integration tests
+```
+
+- **Domain Layer**: Core business logic, entities, and interfaces
+- **Application Layer**: Application services and DTOs
+- **Infrastructure Layer**: External API clients, in-memory repositories, and data persistence
+- **API Layer**: HTTP endpoints, controllers, and WebSocket middleware
 
 ## Contributing
 
